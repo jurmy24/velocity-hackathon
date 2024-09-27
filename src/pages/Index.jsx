@@ -42,15 +42,17 @@ const Index = () => {
       />
       <div className="flex-grow relative">
         {selectedBoard && <Board board={selectedBoard} />}
-        <div className={`fixed top-4 right-4 flex items-center space-x-2 transition-all duration-300 ${isAISidebarOpen ? 'mr-64' : ''}`}>
-          <button
-            onClick={() => setIsAISidebarOpen(!isAISidebarOpen)}
-            className="p-2 bg-background border border-border rounded-full shadow-lg text-primary hover:text-primary-foreground"
-          >
-            <Stars size={20} />
-          </button>
+        <div className="fixed top-4 right-4">
           <ThemeToggle />
         </div>
+        <button
+          onClick={() => setIsAISidebarOpen(!isAISidebarOpen)}
+          className={`fixed top-1/2 -translate-y-1/2 right-0 p-2 bg-background border border-border rounded-l-lg shadow-lg text-primary hover:text-primary-foreground transition-all duration-300 ${
+            isAISidebarOpen ? 'mr-64' : ''
+          }`}
+        >
+          <Stars size={20} />
+        </button>
         <AISidebar isOpen={isAISidebarOpen} onClose={() => setIsAISidebarOpen(false)} />
       </div>
     </div>

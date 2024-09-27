@@ -4,6 +4,7 @@ import { Handle, Position, useUpdateNodeInternals } from 'reactflow';
 const NodeContent = ({ data, isConnectable, id }) => {
     const [content, setContent] = useState(data.content || '');
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
     const updateNodeInternals = useUpdateNodeInternals();
 
     useEffect(() => {
@@ -14,14 +15,14 @@ const NodeContent = ({ data, isConnectable, id }) => {
         setContent(evt.target.value);
     }, []);
 
-    const handleNodeMouseEnter = () => {
+    const handleFocus = () => {
+        setIsEditing(true);
         setShowSuggestions(true);
     };
 
-    const handleNodeMouseLeave = (e) => {
-        if (!e.relatedTarget || !e.relatedTarget.closest('.suggestions-container')) {
-            setShowSuggestions(false);
-        }
+    const handleBlur = () => {
+        setIsEditing(false);
+        setShowSuggestions(false);
     };
 
     const handleSuggestionClick = (suggestion) => {
@@ -56,11 +57,7 @@ const NodeContent = ({ data, isConnectable, id }) => {
     };
 
     return (
-        <div
-            className="bg-white rounded-lg shadow-md p-4 w-64 relative group"
-            onMouseEnter={handleNodeMouseEnter}
-            onMouseLeave={handleNodeMouseLeave}
-        >
+        <div className="bg-white rounded-lg shadow-md p-4 w-64 relative group">
             <Handle 
                 id="top"
                 type="source" 
@@ -113,9 +110,11 @@ const NodeContent = ({ data, isConnectable, id }) => {
                 className="w-full h-24 p-2 border rounded resize-none"
                 value={content}
                 onChange={handleChange}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
                 placeholder="Write your idea here..."
             />
-            {showSuggestions && (
+            {isEditing && showSuggestions && (
                 <div className="suggestions-container absolute top-full left-0 mt-2 z-10">
                     {suggestions.map((suggestion, index) => (
                         <div

@@ -34,30 +34,29 @@ const Index = () => {
 
   return (
     <ReactFlowProvider>
-    <div className="flex h-screen bg-background text-foreground">
-      <Sidebar
-        boards={boards}
-        onAddBoard={handleAddBoard}
-        onSelectBoard={handleSelectBoard}
-        onDeleteBoard={handleDeleteBoard}
-        selectedBoard={selectedBoard}
-      />
-      <div className="flex-grow relative">
-        {selectedBoard && <Board board={selectedBoard} />}
-        <div className="fixed top-4 right-4">
-          <ThemeToggle />
+      <div className="flex h-screen bg-background text-foreground">
+        <Sidebar
+          boards={boards}
+          onAddBoard={handleAddBoard}
+          onSelectBoard={handleSelectBoard}
+          onDeleteBoard={handleDeleteBoard}
+          selectedBoard={selectedBoard}
+        />
+        <div className="flex-grow relative">
+          {selectedBoard && <Board board={selectedBoard} />}
+          <div className="fixed top-4 right-4">
+            <ThemeToggle />
+          </div>
+          <button
+            onClick={() => setIsAISidebarOpen(!isAISidebarOpen)}
+            className={`fixed top-1/2 -translate-y-1/2 right-0 p-2 bg-background border border-border rounded-l-lg shadow-lg text-primary hover:text-primary-foreground transition-all duration-300 ${isAISidebarOpen ? 'mr-64' : ''
+              }`}
+          >
+            <Stars size={20} />
+          </button>
+          <AISidebar isOpen={isAISidebarOpen} onClose={() => setIsAISidebarOpen(false)} />
         </div>
-        <button
-          onClick={() => setIsAISidebarOpen(!isAISidebarOpen)}
-          className={`fixed top-1/2 -translate-y-1/2 right-0 p-2 bg-background border border-border rounded-l-lg shadow-lg text-primary hover:text-primary-foreground transition-all duration-300 ${
-            isAISidebarOpen ? 'mr-64' : ''
-          }`}
-        >
-          <Stars size={20} />
-        </button>
-        <AISidebar isOpen={isAISidebarOpen} onClose={() => setIsAISidebarOpen(false)} />
       </div>
-    </div>
     </ReactFlowProvider>
   );
 };

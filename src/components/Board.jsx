@@ -2,16 +2,60 @@ import React, { useState, useCallback } from 'react';
 import ReactFlow, { addEdge, Background, applyNodeChanges, applyEdgeChanges, useReactFlow } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { MoreHorizontal, MousePointer, PlusCircle, ZoomIn, ZoomOut, Maximize, Lock } from 'lucide-react';
+import NodeContent from './MindMapNode';
+
+const nodeTypes = {
+  custom: NodeContent
+};
+
+
+const initialNodes = [
+  {
+    id: '1',
+    type: 'custom',
+    position: { x: 250, y: 5 },
+    data: {
+      content: '',
+      suggestions: ['Suggestion 1', 'Suggestion 2', 'Suggestion 3']
+    },
+  },
+];
 
 const Board = ({ board }) => {
   const [nodes, setNodes] = useState(board.nodes || []);
   const [edges, setEdges] = useState(board.edges || []);
+
+  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+
+  const handleAddNode = useCallback((content = '', x = Math.random() * 500, y = Math.random() * 500) => {
+    const newNode = {
+      id: (nodes.length + 1).toString(),
+      type: 'custom',
+      position: { x, y },
+      data: {
+        content,
+        suggestions: ['New Suggestion 1', 'New Suggestion 2', 'New Suggestion 3'],
+        onSuggestionClick: handleSuggestionClick
+      },
+    };
+    setNodes((nds) => nds.concat(newNode));
+  }, [nodes, setNodes]);
+
+  const handleSuggestionClick = useCallback((suggestion, parentNode) => {
+    if (parentNode && parentNode.position) {
+      const parentPosition = parentNode.position;
+      handleAddNode(suggestion, parentPosition.x + 200, parentPosition.y + 100);
+    } else {
+      // Fallback to a default position if parentNode or its position is undefined
+      handleAddNode(suggestion);
+    }
+  }, [handleAddNode]);
+  // const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [tool, setTool] = useState('select');
   const [isLocked, setIsLocked] = useState(false);
 
-  const { zoomIn, zoomOut } = useReactFlow();
 
-  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), []);
+  const { zoomIn, zoomOut } = useReactFlow();
 
   const onNodesChange = useCallback((changes) => {
     setNodes((nds) => applyNodeChanges(changes, nds));
@@ -20,15 +64,6 @@ const Board = ({ board }) => {
   const onEdgesChange = useCallback((changes) => {
     setEdges((eds) => applyEdgeChanges(changes, eds));
   }, []);
-
-  const addNode = useCallback(() => {
-    const newNode = {
-      id: `node-${nodes.length + 1}`,
-      data: { label: `Node ${nodes.length + 1}` },
-      position: { x: Math.random() * 50, y: Math.random() * 50 },
-    };
-    setNodes((nds) => [...nds, newNode]);
-  }, [nodes]);
 
   const handleZoomIn = () => {
     zoomIn()
@@ -65,7 +100,7 @@ const Board = ({ board }) => {
           className={`block p-2 hover:bg-accent hover:text-accent-foreground ${tool === 'add' ? 'bg-accent text-accent-foreground' : ''}`}
           onClick={() => {
             setTool('add');
-            addNode();
+            handleAddNode();
           }}
         >
           <PlusCircle size={20} />
@@ -87,8 +122,15 @@ const Board = ({ board }) => {
         </button>
       </div>
       <ReactFlow
-        nodes={nodes}
+        nodes={nodes.map(node => ({
+          ...node,
+          data: {
+            ...node.data,
+            onSuggestionClick: handleSuggestionClick
+          }
+        }))}
         edges={edges}
+        nodeTypes={nodeTypes}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}

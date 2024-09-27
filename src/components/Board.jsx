@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import ReactFlow, { addEdge, Background, MiniMap } from 'reactflow';
+import ReactFlow, { addEdge, Background } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { MoreHorizontal, MousePointer, PlusCircle, ZoomIn, ZoomOut, Maximize, Lock } from 'lucide-react';
 
@@ -98,9 +98,12 @@ const Board = ({ board }) => {
         nodesDraggable={!isLocked}
         nodesConnectable={!isLocked}
         elementsSelectable={!isLocked}
+        minZoom={0.2}
+        maxZoom={4}
+        defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+        attributionPosition="bottom-left"
       >
         <Background />
-        <MiniMap />
       </ReactFlow>
     </div>
   );

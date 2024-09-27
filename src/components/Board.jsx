@@ -1,43 +1,46 @@
 import React, { useState, useCallback } from 'react';
-import ReactFlow, { addEdge, Background } from 'reactflow';
+import ReactFlow, {
+  addEdge,
+  Background,
+  useNodesState,
+  useEdgesState,
+  Controls,
+} from 'reactflow';
 import 'reactflow/dist/style.css';
 import { MoreHorizontal, MousePointer, PlusCircle, ZoomIn, ZoomOut, Maximize, Lock } from 'lucide-react';
 
 const Board = ({ board }) => {
-  const [nodes, setNodes] = useState(board.nodes || []);
-  const [edges, setEdges] = useState(board.edges || []);
+  const [nodes, setNodes, onNodesChange] = useNodesState(board.nodes || []);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(board.edges || []);
   const [tool, setTool] = useState('select');
   const [isLocked, setIsLocked] = useState(false);
 
-  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), []);
-
-  const onNodesChange = useCallback((changes) => {
-    setNodes((nds) => applyNodeChanges(changes, nds));
-  }, []);
-
-  const onEdgesChange = useCallback((changes) => {
-    setEdges((eds) => applyEdgeChanges(changes, eds));
-  }, []);
+  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
   const addNode = useCallback(() => {
     const newNode = {
       id: `node-${nodes.length + 1}`,
       data: { label: `Node ${nodes.length + 1}` },
       position: { x: Math.random() * 500, y: Math.random() * 500 },
+      type: 'default',
     };
     setNodes((nds) => [...nds, newNode]);
-  }, [nodes]);
+  }, [nodes, setNodes]);
 
-  const handleZoomIn = useCallback(() => {
-    // Implement zoom in functionality
+  const handleZoomIn = useCallback((zoomIn) => {
+    zoomIn();
   }, []);
 
-  const handleZoomOut = useCallback(() => {
-    // Implement zoom out functionality
+  const handleZoomOut = useCallback((zoomOut) => {
+    zoomOut();
   }, []);
 
   const handleFullScreen = useCallback(() => {
-    // Implement full screen functionality
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
   }, []);
 
   const toggleLock = useCallback(() => {
@@ -68,10 +71,10 @@ const Board = ({ board }) => {
         >
           <PlusCircle size={20} />
         </button>
-        <button className="block p-2 hover:bg-accent hover:text-accent-foreground" onClick={handleZoomIn}>
+        <button className="block p-2 hover:bg-accent hover:text-accent-foreground" onClick={() => handleZoomIn()}>
           <ZoomIn size={20} />
         </button>
-        <button className="block p-2 hover:bg-accent hover:text-accent-foreground" onClick={handleZoomOut}>
+        <button className="block p-2 hover:bg-accent hover:text-accent-foreground" onClick={() => handleZoomOut()}>
           <ZoomOut size={20} />
         </button>
         <button className="block p-2 hover:bg-accent hover:text-accent-foreground" onClick={handleFullScreen}>
@@ -104,6 +107,7 @@ const Board = ({ board }) => {
         attributionPosition="bottom-left"
       >
         <Background />
+        <Controls />
       </ReactFlow>
     </div>
   );

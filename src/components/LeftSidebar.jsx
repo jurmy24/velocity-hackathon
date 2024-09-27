@@ -41,11 +41,10 @@ const Sidebar = ({
           {boards.map((board) => (
             <li
               key={board.id}
-              className={`flex items-center justify-between cursor-pointer hover:bg-accent hover:text-accent-foreground p-2 rounded ${
-                selectedBoard && selectedBoard.id === board.id
-                  ? "bg-accent text-accent-foreground"
-                  : ""
-              }`}
+              className={`flex items-center justify-between cursor-pointer hover:bg-accent hover:text-accent-foreground p-2 rounded ${selectedBoard && selectedBoard.id === board.id
+                ? "bg-accent text-accent-foreground"
+                : ""
+                }`}
             >
               <span onClick={() => onSelectBoard(board.id)}>{board.name}</span>
               <button

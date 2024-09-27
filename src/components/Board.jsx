@@ -2,19 +2,47 @@ import React, { useState, useCallback } from 'react';
 import ReactFlow, { addEdge, Background, applyNodeChanges, applyEdgeChanges, useReactFlow } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { MoreHorizontal, MousePointer, PlusCircle, ZoomIn, ZoomOut, Maximize, Lock } from 'lucide-react';
+import NodeContent from './MindMapNode';
+
+const nodeTypes = {
+  custom: NodeContent
+};
 
 const Board = ({ board }) => {
   const [nodes, setNodes] = useState(board.nodes || []);
   const [edges, setEdges] = useState(board.edges || []);
-  const [tool, setTool] = useState("select");
+
+  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+
+  const handleAddNode = useCallback((content = '', x = Math.random() * 500, y = Math.random() * 500) => {
+    const newNode = {
+      id: (nodes.length + 1).toString(),
+      type: 'custom',
+      position: { x, y },
+      data: {
+        content,
+        suggestions: ['New Suggestion 1', 'New Suggestion 2', 'New Suggestion 3'],
+        onSuggestionClick: handleSuggestionClick
+      },
+    };
+    setNodes((nds) => nds.concat(newNode));
+  }, [nodes, setNodes]);
+
+  const handleSuggestionClick = useCallback((suggestion, parentNode) => {
+    if (parentNode && parentNode.position) {
+      const parentPosition = parentNode.position;
+      handleAddNode(suggestion, parentPosition.x + 200, parentPosition.y + 100);
+    } else {
+      // Fallback to a default position if parentNode or its position is undefined
+      handleAddNode(suggestion);
+    }
+  }, [handleAddNode]);
+  // const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [tool, setTool] = useState('select');
   const [isLocked, setIsLocked] = useState(false);
 
-  const { zoomIn, zoomOut } = useReactFlow();
 
-  const onConnect = useCallback(
-    (params) => setEdges((eds) => addEdge(params, eds)),
-    [],
-  );
+  const { zoomIn, zoomOut } = useReactFlow();
 
   const onNodesChange = useCallback((changes) => {
     setNodes((nds) => applyNodeChanges(changes, nds));
@@ -23,15 +51,6 @@ const Board = ({ board }) => {
   const onEdgesChange = useCallback((changes) => {
     setEdges((eds) => applyEdgeChanges(changes, eds));
   }, []);
-
-  const addNode = useCallback(() => {
-    const newNode = {
-      id: `node-${nodes.length + 1}`,
-      data: { label: `Node ${nodes.length + 1}` },
-      position: { x: Math.random() * 50, y: Math.random() * 50 },
-    };
-    setNodes((nds) => [...nds, newNode]);
-  }, [nodes]);
 
   const handleZoomIn = () => {
     zoomIn()
@@ -59,48 +78,46 @@ const Board = ({ board }) => {
       </div>
       <div className="z-50 absolute left-4 top-1/2 transform -translate-y-1/2 bg-background border border-border rounded-lg shadow-lg">
         <button
-          className={`block p-2 hover:bg-accent hover:text-accent-foreground ${tool === "select" ? "bg-accent text-accent-foreground" : ""}`}
-          onClick={() => setTool("select")}
+          className={`block p-2 hover:bg-accent hover:text-accent-foreground ${tool === 'select' ? 'bg-accent text-accent-foreground' : ''}`}
+          onClick={() => setTool('select')}
         >
           <MousePointer size={20} />
         </button>
         <button
-          className={`block p-2 hover:bg-accent hover:text-accent-foreground ${tool === "add" ? "bg-accent text-accent-foreground" : ""}`}
+          className={`block p-2 hover:bg-accent hover:text-accent-foreground ${tool === 'add' ? 'bg-accent text-accent-foreground' : ''}`}
           onClick={() => {
-            setTool("add");
-            addNode();
+            setTool('add');
+            handleAddNode();
           }}
         >
           <PlusCircle size={20} />
         </button>
-        <button
-          className="block p-2 hover:bg-accent hover:text-accent-foreground"
-          onClick={handleZoomIn}
-        >
+        <button className="block p-2 hover:bg-accent hover:text-accent-foreground" onClick={handleZoomIn}>
           <ZoomIn size={20} />
         </button>
-        <button
-          className="block p-2 hover:bg-accent hover:text-accent-foreground"
-          onClick={handleZoomOut}
-        >
+        <button className="block p-2 hover:bg-accent hover:text-accent-foreground" onClick={handleZoomOut}>
           <ZoomOut size={20} />
         </button>
-        <button
-          className="block p-2 hover:bg-accent hover:text-accent-foreground"
-          onClick={handleFullScreen}
-        >
+        <button className="block p-2 hover:bg-accent hover:text-accent-foreground" onClick={handleFullScreen}>
           <Maximize size={20} />
         </button>
         <button
-          className={`block p-2 hover:bg-accent hover:text-accent-foreground ${isLocked ? "bg-accent text-accent-foreground" : ""}`}
+          className={`block p-2 hover:bg-accent hover:text-accent-foreground ${isLocked ? 'bg-accent text-accent-foreground' : ''}`}
           onClick={toggleLock}
         >
           <Lock size={20} />
         </button>
       </div>
       <ReactFlow
-        nodes={nodes}
+        nodes={nodes.map(node => ({
+          ...node,
+          data: {
+            ...node.data,
+            onSuggestionClick: handleSuggestionClick
+          }
+        }))}
         edges={edges}
+        nodeTypes={nodeTypes}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
@@ -125,4 +142,3 @@ const Board = ({ board }) => {
 };
 
 export default Board;
-

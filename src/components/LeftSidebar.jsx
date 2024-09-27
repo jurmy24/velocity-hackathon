@@ -18,11 +18,11 @@ const Sidebar = ({
   };
 
   return (
-    <div className="w-64 h-full bg-background border-r border-border p-4">
+    <div className="w-66 h-full bg-background border-r border-border p-4">
       <h1 className="text-2xl font-bold mb-4">MindFlow</h1>
       <div className="mb-4">
         <h2 className="text-lg font-semibold mb-2">Boards</h2>
-        <div className="flex items-center mb-2">
+        <div className="flex items-center">
           <input
             type="text"
             value={newBoardName}
@@ -46,7 +46,8 @@ const Sidebar = ({
                 : ""
                 }`}
             >
-              <span onClick={() => onSelectBoard(board.id)}>{board.name}</span>
+              <span onClick={() => onSelectBoard(board.id)}
+                className="w-full">{board.name}</span>
               <button
                 onClick={() => onDeleteBoard(board.id)}
                 className="text-destructive hover:text-destructive-foreground"

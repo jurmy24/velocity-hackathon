@@ -46,7 +46,7 @@ const Index = () => {
         />
         <div className="flex-grow relative">
           {selectedBoard && <Board board={selectedBoard} />}
-          <div className="fixed top-4 right-4">
+          <div className="fixed top-4 right-4 bg-white dark:bg-black">
             <ThemeToggle />
           </div>
           <button

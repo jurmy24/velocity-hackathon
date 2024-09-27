@@ -14,6 +14,9 @@ const NodeContent = ({ data, isConnectable }) => {
     };
 
     const handleNodeMouseLeave = (e) => {
+        if (e === undefined) {
+            return;
+        }
         if (!e.relatedTarget || !e.relatedTarget.closest('.suggestions-container')) {
             setShowSuggestions(false);
         }

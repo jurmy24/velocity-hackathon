@@ -1,15 +1,20 @@
 import React, { useState, useCallback } from 'react';
-import ReactFlow, { addEdge, Background } from 'reactflow';
+import ReactFlow, { addEdge, Background, applyNodeChanges, applyEdgeChanges, useReactFlow } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { MoreHorizontal, MousePointer, PlusCircle, ZoomIn, ZoomOut, Maximize, Lock } from 'lucide-react';
 
 const Board = ({ board }) => {
   const [nodes, setNodes] = useState(board.nodes || []);
   const [edges, setEdges] = useState(board.edges || []);
-  const [tool, setTool] = useState('select');
+  const [tool, setTool] = useState("select");
   const [isLocked, setIsLocked] = useState(false);
 
-  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), []);
+  const { zoomIn, zoomOut } = useReactFlow();
+
+  const onConnect = useCallback(
+    (params) => setEdges((eds) => addEdge(params, eds)),
+    [],
+  );
 
   const onNodesChange = useCallback((changes) => {
     setNodes((nds) => applyNodeChanges(changes, nds));
@@ -23,18 +28,18 @@ const Board = ({ board }) => {
     const newNode = {
       id: `node-${nodes.length + 1}`,
       data: { label: `Node ${nodes.length + 1}` },
-      position: { x: Math.random() * 500, y: Math.random() * 500 },
+      position: { x: Math.random() * 50, y: Math.random() * 50 },
     };
     setNodes((nds) => [...nds, newNode]);
   }, [nodes]);
 
-  const handleZoomIn = useCallback(() => {
-    // Implement zoom in functionality
-  }, []);
+  const handleZoomIn = () => {
+    zoomIn()
+  };
 
-  const handleZoomOut = useCallback(() => {
-    // Implement zoom out functionality
-  }, []);
+  const handleZoomOut = () => {
+    zoomOut()
+  };
 
   const handleFullScreen = useCallback(() => {
     // Implement full screen functionality
@@ -52,33 +57,42 @@ const Board = ({ board }) => {
           <MoreHorizontal size={20} />
         </button>
       </div>
-      <div className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-background border border-border rounded-lg shadow-lg">
+      <div className="z-50 absolute left-4 top-1/2 transform -translate-y-1/2 bg-background border border-border rounded-lg shadow-lg">
         <button
-          className={`block p-2 hover:bg-accent hover:text-accent-foreground ${tool === 'select' ? 'bg-accent text-accent-foreground' : ''}`}
-          onClick={() => setTool('select')}
+          className={`block p-2 hover:bg-accent hover:text-accent-foreground ${tool === "select" ? "bg-accent text-accent-foreground" : ""}`}
+          onClick={() => setTool("select")}
         >
           <MousePointer size={20} />
         </button>
         <button
-          className={`block p-2 hover:bg-accent hover:text-accent-foreground ${tool === 'add' ? 'bg-accent text-accent-foreground' : ''}`}
+          className={`block p-2 hover:bg-accent hover:text-accent-foreground ${tool === "add" ? "bg-accent text-accent-foreground" : ""}`}
           onClick={() => {
-            setTool('add');
+            setTool("add");
             addNode();
           }}
         >
           <PlusCircle size={20} />
         </button>
-        <button className="block p-2 hover:bg-accent hover:text-accent-foreground" onClick={handleZoomIn}>
+        <button
+          className="block p-2 hover:bg-accent hover:text-accent-foreground"
+          onClick={handleZoomIn}
+        >
           <ZoomIn size={20} />
         </button>
-        <button className="block p-2 hover:bg-accent hover:text-accent-foreground" onClick={handleZoomOut}>
+        <button
+          className="block p-2 hover:bg-accent hover:text-accent-foreground"
+          onClick={handleZoomOut}
+        >
           <ZoomOut size={20} />
         </button>
-        <button className="block p-2 hover:bg-accent hover:text-accent-foreground" onClick={handleFullScreen}>
+        <button
+          className="block p-2 hover:bg-accent hover:text-accent-foreground"
+          onClick={handleFullScreen}
+        >
           <Maximize size={20} />
         </button>
         <button
-          className={`block p-2 hover:bg-accent hover:text-accent-foreground ${isLocked ? 'bg-accent text-accent-foreground' : ''}`}
+          className={`block p-2 hover:bg-accent hover:text-accent-foreground ${isLocked ? "bg-accent text-accent-foreground" : ""}`}
           onClick={toggleLock}
         >
           <Lock size={20} />
@@ -95,6 +109,7 @@ const Board = ({ board }) => {
         selectionOnDrag
         panOnDrag={!isLocked}
         zoomOnScroll={!isLocked}
+        zoomOnPinch={!isLocked}
         nodesDraggable={!isLocked}
         nodesConnectable={!isLocked}
         elementsSelectable={!isLocked}
@@ -110,3 +125,4 @@ const Board = ({ board }) => {
 };
 
 export default Board;
+

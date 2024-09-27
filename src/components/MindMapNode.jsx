@@ -1,134 +1,142 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { Handle, Position, useUpdateNodeInternals } from 'reactflow';
+import React, { useState, useCallback, useEffect } from "react";
+import { Handle, Position, useUpdateNodeInternals } from "@xyflow/react";
 
 const NodeContent = ({ data, isConnectable, id }) => {
-    const [content, setContent] = useState(data.content || '');
-    const [showSuggestions, setShowSuggestions] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
-    const updateNodeInternals = useUpdateNodeInternals();
+  const [content, setContent] = useState(data.content || "");
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
-    useEffect(() => {
-        updateNodeInternals(id);
-    }, [id, updateNodeInternals]);
+  const [isEditing, setIsEditing] = useState(false);
+  const updateNodeInternals = useUpdateNodeInternals();
 
-    const handleChange = useCallback((evt) => {
-        setContent(evt.target.value);
-    }, []);
+  useEffect(() => {
+    updateNodeInternals(id);
+  }, [id, updateNodeInternals]);
 
-    const handleFocus = () => {
-        setIsEditing(true);
-        setShowSuggestions(true);
-    };
+  const handleChange = useCallback((evt) => {
+    setContent(evt.target.value);
+  }, []);
 
-    const handleBlur = () => {
-        setIsEditing(false);
-        setShowSuggestions(false);
-    };
+  const handleFocus = () => {
+    setIsEditing(true);
+    setShowSuggestions(true);
+  };
 
-    const handleSuggestionClick = (suggestion) => {
-        if (data.onSuggestionClick && typeof data.onSuggestionClick === 'function') {
-            data.onSuggestionClick(suggestion, data);
-        } else {
-            console.warn('onSuggestionClick is not provided or is not a function');
-        }
-    };
+  const handleBlur = () => {
+    setIsEditing(false);
+    setShowSuggestions(false);
+  };
 
-    const suggestions = data.suggestions || ['Suggestion 1', 'Suggestion 2', 'Suggestion 3'];
+  const handleSuggestionClick = (suggestion) => {
+    if (
+      data.onSuggestionClick &&
+      typeof data.onSuggestionClick === "function"
+    ) {
+      data.onSuggestionClick(suggestion, data);
+    } else {
+      console.warn("onSuggestionClick is not provided or is not a function");
+    }
+  };
 
-    // Styles for the handles
-    const handleStyle = {
-        opacity: 3,
-        width: '6px',
-        height: '6px',
-        borderRadius: '50%',
-        border: '2px solid #ddd',
-        background: '#fff',
-        transition: 'opacity 0.3s',
-    };
+  const suggestions = data.suggestions || [
+    "Suggestion 1",
+    "Suggestion 2",
+    "Suggestion 3",
+  ];
 
-    const onConnect = (params) => {
-        console.log('New connection:', params);
-        // Add any custom connection logic here
-    };
+  // Styles for the handles
+  const handleStyle = {
+    opacity: 3,
+    width: "6px",
+    height: "6px",
+    borderRadius: "50%",
+    border: "2px solid #ddd",
+    background: "#fff",
+    transition: "opacity 0.3s",
+  };
 
-    const isValidConnection = () => {
-        // Add any custom validation logic here
-        return true;
-    };
+  const onConnect = (params) => {
+    console.log("New connection:", params);
+    // Add any custom connection logic here
+  };
 
-    return (
-        <div className="bg-white rounded-lg shadow-md p-4 w-64 relative group">
-            <Handle 
-                id="top"
-                type="source" 
-                position={Position.Top} 
-                style={{ ...handleStyle, top: '-5px', left: 'calc(50% - 5px)' }}
-                isConnectable={isConnectable}
-                isConnectableStart={true}
-                isConnectableEnd={true}
-                onConnect={onConnect}
-                isValidConnection={isValidConnection}
-                className="group-hover:opacity-100 connecting"
-            />
-            <Handle 
-                id="right"
-                type="source" 
-                position={Position.Right} 
-                style={{ ...handleStyle, right: '-5px', top: 'calc(50% - 5px)' }}
-                isConnectable={isConnectable}
-                isConnectableStart={true}
-                isConnectableEnd={true}
-                onConnect={onConnect}
-                isValidConnection={isValidConnection}
-                className="group-hover:opacity-100 connecting"
-            />
-            <Handle 
-                id="bottom"
-                type="source" 
-                position={Position.Bottom} 
-                style={{ ...handleStyle, bottom: '-5px', left: 'calc(50% - 5px)' }}
-                isConnectable={isConnectable}
-                isConnectableStart={true}
-                isConnectableEnd={true}
-                onConnect={onConnect}
-                isValidConnection={isValidConnection}
-                className="group-hover:opacity-100 connecting"
-            />
-            <Handle 
-                id="left"
-                type="source" 
-                position={Position.Left} 
-                style={{ ...handleStyle, left: '-5px', top: 'calc(50% - 5px)' }}
-                isConnectable={isConnectable}
-                isConnectableStart={true}
-                isConnectableEnd={true}
-                onConnect={onConnect}
-                isValidConnection={isValidConnection}
-                className="group-hover:opacity-100 connecting"
-            />
-            <textarea
-                className="w-full h-24 p-2 border rounded resize-none"
-                value={content}
-                onChange={handleChange}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-                placeholder="Write your idea here..."
-            />
-            {isEditing && showSuggestions && (
-                <div className="suggestions-container absolute top-full left-0 mt-2 z-10">
-                    {suggestions.map((suggestion, index) => (
-                        <div
-                            key={index}
-                            className="bg-gray-200 opacity-70 p-2 rounded mb-2 cursor-pointer hover:bg-gray-300"
-                            onClick={() => handleSuggestionClick(suggestion)}
-                        >
-                            {suggestion}
-                        </div>
-                    ))}
-                </div>
-            )}
+  const isValidConnection = () => {
+    // Add any custom validation logic here
+    return true;
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-md p-4 w-64 relative group">
+      <Handle
+        id="top"
+        type="source"
+        position={Position.Top}
+        style={{ ...handleStyle, top: "-5px", left: "calc(50% - 5px)" }}
+        isConnectable={isConnectable}
+        isConnectableStart={true}
+        isConnectableEnd={true}
+        onConnect={onConnect}
+        isValidConnection={isValidConnection}
+        className="group-hover:opacity-100 connecting"
+      />
+      <Handle
+        id="right"
+        type="source"
+        position={Position.Right}
+        style={{ ...handleStyle, right: "-5px", top: "calc(50% - 5px)" }}
+        isConnectable={isConnectable}
+        isConnectableStart={true}
+        isConnectableEnd={true}
+        onConnect={onConnect}
+        isValidConnection={isValidConnection}
+        className="group-hover:opacity-100 connecting"
+      />
+      <Handle
+        id="bottom"
+        type="source"
+        position={Position.Bottom}
+        style={{ ...handleStyle, bottom: "-5px", left: "calc(50% - 5px)" }}
+        isConnectable={isConnectable}
+        isConnectableStart={true}
+        isConnectableEnd={true}
+        onConnect={onConnect}
+        isValidConnection={isValidConnection}
+        className="group-hover:opacity-100 connecting"
+      />
+      <Handle
+        id="left"
+        type="source"
+        position={Position.Left}
+        style={{ ...handleStyle, left: "-5px", top: "calc(50% - 5px)" }}
+        isConnectable={isConnectable}
+        isConnectableStart={true}
+        isConnectableEnd={true}
+        onConnect={onConnect}
+        isValidConnection={isValidConnection}
+        className="group-hover:opacity-100 connecting"
+      />
+      <textarea
+        className="w-full h-24 p-2 border rounded resize-none"
+        value={content}
+        onChange={handleChange}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        placeholder="Write your idea here..."
+      />
+      {isEditing && showSuggestions && (
+        <div className="suggestions-container absolute top-full left-0 mt-2 z-10">
+          {suggestions.map((suggestion, index) => (
+            <div
+              key={index}
+              className="bg-gray-200 opacity-70 p-2 rounded mb-2 cursor-pointer hover:bg-gray-300"
+              onClick={() => handleSuggestionClick(suggestion)}
+            >
+              {suggestion}
+            </div>
+          ))}
         </div>
-    );
+      )}
+    </div>
+  );
 };
 
 export default NodeContent;

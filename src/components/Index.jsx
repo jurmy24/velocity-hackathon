@@ -1,17 +1,17 @@
 "use client";
 
-import { ReactFlowProvider } from 'reactflow';
-import React, { useState } from 'react';
-import Sidebar from './LeftSidebar';
-import Board from '../components/Board';
-import { ThemeToggle } from '../components/ThemeToggle';
-import AISidebar from './RightSidebar';
-import { Stars } from 'lucide-react';
+import { ReactFlowProvider } from "@xyflow/react";
+import React, { useState } from "react";
+import Sidebar from "./LeftSidebar";
+import Board from "../components/Board";
+import { ThemeToggle } from "../components/ThemeToggle";
+import AISidebar from "./RightSidebar";
+import { Stars } from "lucide-react";
 
 const Index = () => {
   const [boards, setBoards] = useState([
-    { id: 1, name: 'Hackathon', nodes: [], edges: [] },
-    { id: 2, name: 'Thesis', nodes: [], edges: [] },
+    { id: 1, name: "Hackathon", nodes: [], edges: [] },
+    { id: 2, name: "Thesis", nodes: [], edges: [] },
   ]);
   const [selectedBoard, setSelectedBoard] = useState(boards[0]);
   const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
@@ -51,12 +51,16 @@ const Index = () => {
           </div>
           <button
             onClick={() => setIsAISidebarOpen(!isAISidebarOpen)}
-            className={`fixed top-1/2 -translate-y-1/2 right-0 p-2 bg-white dark:bg-black border border-border rounded-l-lg shadow-lg text-primary hover:text-primary-foreground transition-all duration-300 ${isAISidebarOpen ? 'mr-64' : ''
-              }`}
+            className={`fixed top-1/2 -translate-y-1/2 right-0 p-2 bg-white dark:bg-black border border-border rounded-l-lg shadow-lg text-primary hover:text-primary-foreground transition-all duration-300 ${
+              isAISidebarOpen ? "mr-64" : ""
+            }`}
           >
             <Stars size={20} />
           </button>
-          <AISidebar isOpen={isAISidebarOpen} onClose={() => setIsAISidebarOpen(false)} />
+          <AISidebar
+            isOpen={isAISidebarOpen}
+            onClose={() => setIsAISidebarOpen(false)}
+          />
         </div>
       </div>
     </ReactFlowProvider>

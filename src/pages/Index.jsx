@@ -23,11 +23,24 @@ const Index = () => {
     if (board) setSelectedBoard(board);
   };
 
+  const handleDeleteBoard = (id) => {
+    const updatedBoards = boards.filter((board) => board.id !== id);
+    setBoards(updatedBoards);
+    if (selectedBoard.id === id) {
+      setSelectedBoard(updatedBoards[0] || null);
+    }
+  };
+
   return (
     <div className="flex h-screen bg-background text-foreground">
-      <Sidebar boards={boards} onAddBoard={handleAddBoard} onSelectBoard={handleSelectBoard} />
+      <Sidebar
+        boards={boards}
+        onAddBoard={handleAddBoard}
+        onSelectBoard={handleSelectBoard}
+        onDeleteBoard={handleDeleteBoard}
+      />
       <div className="flex-grow relative">
-        <Board board={selectedBoard} />
+        {selectedBoard && <Board board={selectedBoard} />}
         <div className={`fixed top-4 right-4 flex items-center space-x-2 transition-all duration-300 ${isAISidebarOpen ? 'mr-64' : ''}`}>
           <button
             onClick={() => setIsAISidebarOpen(!isAISidebarOpen)}

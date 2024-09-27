@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, Trash2 } from 'lucide-react';
 
-const Sidebar = ({ boards, onAddBoard, onSelectBoard }) => {
+const Sidebar = ({ boards, onAddBoard, onSelectBoard, onDeleteBoard }) => {
   const [newBoardName, setNewBoardName] = useState('');
 
   const handleAddBoard = () => {
@@ -32,10 +32,15 @@ const Sidebar = ({ boards, onAddBoard, onSelectBoard }) => {
           {boards.map((board) => (
             <li
               key={board.id}
-              className="cursor-pointer hover:bg-accent hover:text-accent-foreground p-2 rounded"
-              onClick={() => onSelectBoard(board.id)}
+              className="flex items-center justify-between cursor-pointer hover:bg-accent hover:text-accent-foreground p-2 rounded"
             >
-              {board.name}
+              <span onClick={() => onSelectBoard(board.id)}>{board.name}</span>
+              <button
+                onClick={() => onDeleteBoard(board.id)}
+                className="text-destructive hover:text-destructive-foreground"
+              >
+                <Trash2 size={18} />
+              </button>
             </li>
           ))}
         </ul>

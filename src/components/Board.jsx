@@ -1,10 +1,11 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import ReactFlow, {
   addEdge,
   Background,
   useNodesState,
   useEdgesState,
   Controls,
+  useReactFlow,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { MoreHorizontal } from 'lucide-react';
@@ -15,6 +16,7 @@ const Board = ({ board }) => {
   const [edges, setEdges, onEdgesChange] = useEdgesState(board.edges || []);
   const [tool, setTool] = useState('select');
   const [isLocked, setIsLocked] = useState(false);
+  const reactFlowInstance = useReactFlow();
 
   const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
@@ -28,13 +30,13 @@ const Board = ({ board }) => {
     setNodes((nds) => [...nds, newNode]);
   }, [nodes, setNodes]);
 
-  const handleZoomIn = useCallback((zoomIn) => {
-    zoomIn();
-  }, []);
+  const handleZoomIn = useCallback(() => {
+    reactFlowInstance.zoomIn();
+  }, [reactFlowInstance]);
 
-  const handleZoomOut = useCallback((zoomOut) => {
-    zoomOut();
-  }, []);
+  const handleZoomOut = useCallback(() => {
+    reactFlowInstance.zoomOut();
+  }, [reactFlowInstance]);
 
   const handleFullScreen = useCallback(() => {
     if (!document.fullscreenElement) {
@@ -60,8 +62,8 @@ const Board = ({ board }) => {
         onAddNode={addNode}
         onSelectTool={setTool}
         selectedTool={tool}
-        onZoomIn={() => handleZoomIn()}
-        onZoomOut={() => handleZoomOut()}
+        onZoomIn={handleZoomIn}
+        onZoomOut={handleZoomOut}
         onFullScreen={handleFullScreen}
         onToggleLock={toggleLock}
         isLocked={isLocked}

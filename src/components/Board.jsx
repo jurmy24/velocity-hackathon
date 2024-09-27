@@ -1,11 +1,11 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import ReactFlow, {
   addEdge,
   Background,
   useNodesState,
   useEdgesState,
   Controls,
-  useReactFlow,
+  ReactFlowProvider,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { MoreHorizontal } from 'lucide-react';
@@ -16,7 +16,6 @@ const Board = ({ board }) => {
   const [edges, setEdges, onEdgesChange] = useEdgesState(board.edges || []);
   const [tool, setTool] = useState('select');
   const [isLocked, setIsLocked] = useState(false);
-  const reactFlowInstance = useReactFlow();
 
   const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
@@ -31,12 +30,12 @@ const Board = ({ board }) => {
   }, [nodes, setNodes]);
 
   const handleZoomIn = useCallback(() => {
-    reactFlowInstance.zoomIn();
-  }, [reactFlowInstance]);
+    // This will be handled by ReactFlow's built-in controls
+  }, []);
 
   const handleZoomOut = useCallback(() => {
-    reactFlowInstance.zoomOut();
-  }, [reactFlowInstance]);
+    // This will be handled by ReactFlow's built-in controls
+  }, []);
 
   const handleFullScreen = useCallback(() => {
     if (!document.fullscreenElement) {
@@ -51,46 +50,48 @@ const Board = ({ board }) => {
   }, [isLocked]);
 
   return (
-    <div className="w-full h-full relative">
-      <div className="absolute top-4 left-4 z-10 flex items-center bg-background/80 backdrop-blur-sm rounded-lg px-4 py-2">
-        <h2 className="text-xl font-semibold mr-2">{board.name}</h2>
-        <button className="text-muted-foreground hover:text-foreground">
-          <MoreHorizontal size={20} />
-        </button>
+    <ReactFlowProvider>
+      <div className="w-full h-full relative">
+        <div className="absolute top-4 left-4 z-10 flex items-center bg-background/80 backdrop-blur-sm rounded-lg px-4 py-2">
+          <h2 className="text-xl font-semibold mr-2">{board.name}</h2>
+          <button className="text-muted-foreground hover:text-foreground">
+            <MoreHorizontal size={20} />
+          </button>
+        </div>
+        <ToolButton
+          onAddNode={addNode}
+          onSelectTool={setTool}
+          selectedTool={tool}
+          onZoomIn={handleZoomIn}
+          onZoomOut={handleZoomOut}
+          onFullScreen={handleFullScreen}
+          onToggleLock={toggleLock}
+          isLocked={isLocked}
+        />
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          fitView
+          panOnScroll
+          selectionOnDrag
+          panOnDrag={!isLocked}
+          zoomOnScroll={!isLocked}
+          nodesDraggable={!isLocked}
+          nodesConnectable={!isLocked}
+          elementsSelectable={!isLocked}
+          minZoom={0.2}
+          maxZoom={4}
+          defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+          attributionPosition="bottom-left"
+        >
+          <Background />
+          <Controls />
+        </ReactFlow>
       </div>
-      <ToolButton
-        onAddNode={addNode}
-        onSelectTool={setTool}
-        selectedTool={tool}
-        onZoomIn={handleZoomIn}
-        onZoomOut={handleZoomOut}
-        onFullScreen={handleFullScreen}
-        onToggleLock={toggleLock}
-        isLocked={isLocked}
-      />
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        fitView
-        panOnScroll
-        selectionOnDrag
-        panOnDrag={!isLocked}
-        zoomOnScroll={!isLocked}
-        nodesDraggable={!isLocked}
-        nodesConnectable={!isLocked}
-        elementsSelectable={!isLocked}
-        minZoom={0.2}
-        maxZoom={4}
-        defaultViewport={{ x: 0, y: 0, zoom: 1 }}
-        attributionPosition="bottom-left"
-      >
-        <Background />
-        <Controls />
-      </ReactFlow>
-    </div>
+    </ReactFlowProvider>
   );
 };
 

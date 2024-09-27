@@ -8,19 +8,6 @@ const nodeTypes = {
   custom: NodeContent
 };
 
-
-const initialNodes = [
-  {
-    id: '1',
-    type: 'custom',
-    position: { x: 250, y: 5 },
-    data: {
-      content: '',
-      suggestions: ['Suggestion 1', 'Suggestion 2', 'Suggestion 3']
-    },
-  },
-];
-
 const Board = ({ board }) => {
   const [nodes, setNodes] = useState(board.nodes || []);
   const [edges, setEdges] = useState(board.edges || []);

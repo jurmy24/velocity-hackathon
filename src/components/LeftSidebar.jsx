@@ -46,7 +46,8 @@ const Sidebar = ({
                 : ""
                 }`}
             >
-              <span onClick={() => onSelectBoard(board.id)}>{board.name}</span>
+              <span onClick={() => onSelectBoard(board.id)}
+                className="w-full">{board.name}</span>
               <button
                 onClick={() => onDeleteBoard(board.id)}
                 className="text-destructive hover:text-destructive-foreground"

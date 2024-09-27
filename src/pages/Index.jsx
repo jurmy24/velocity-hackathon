@@ -1,3 +1,4 @@
+import { ReactFlowProvider } from 'reactflow';
 import React, { useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import Board from '../components/Board';
@@ -32,6 +33,7 @@ const Index = () => {
   };
 
   return (
+    <ReactFlowProvider>
     <div className="flex h-screen bg-background text-foreground">
       <Sidebar
         boards={boards}
@@ -56,6 +58,7 @@ const Index = () => {
         <AISidebar isOpen={isAISidebarOpen} onClose={() => setIsAISidebarOpen(false)} />
       </div>
     </div>
+    </ReactFlowProvider>
   );
 };
 

@@ -1,20 +1,28 @@
-import React, { useState } from "react";
+"use client";
+import { useState } from "react";
 import { PlusCircle, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const Sidebar = ({
   boards,
-  onAddBoard,
-  onSelectBoard,
-  onDeleteBoard,
   selectedBoard,
+  setSelectedBoard,
+  onAddBoard,
+  onDeleteBoard,
 }) => {
   const [newBoardName, setNewBoardName] = useState("");
+  const router = useRouter();
 
   const handleAddBoard = () => {
     if (newBoardName.trim()) {
       onAddBoard(newBoardName.trim());
       setNewBoardName("");
     }
+  };
+
+  const handleSelectBoard = (board) => {
+    setSelectedBoard(board);
+    router.push(`/board/${board.id}`);
   };
 
   return (
@@ -47,7 +55,7 @@ const Sidebar = ({
                   : ""
               }`}
             >
-              <span onClick={() => onSelectBoard(board.id)} className="w-full">
+              <span onClick={() => handleSelectBoard(board)} className="w-full">
                 {board.title}
               </span>
               <button

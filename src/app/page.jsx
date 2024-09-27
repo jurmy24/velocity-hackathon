@@ -2,7 +2,6 @@
 
 import dynamic from "next/dynamic";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import Index from "../components/Index";
 
 const ThemeProvider = dynamic(
   () => import("../components/theme-provider").then((mod) => mod.ThemeProvider),
@@ -24,7 +23,7 @@ const App = () => (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <TooltipProvider>
         <Toaster />
-        <Index />
+        <h1>Great äpplication</h1>
       </TooltipProvider>
     </ThemeProvider>
   </QueryClientProvider>

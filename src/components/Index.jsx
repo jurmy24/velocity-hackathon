@@ -51,7 +51,7 @@ const Index = () => {
           </div>
           <button
             onClick={() => setIsAISidebarOpen(!isAISidebarOpen)}
-            className={`fixed top-1/2 -translate-y-1/2 right-0 p-2 bg-white dark:bg-black border border-border rounded-l-lg shadow-lg text-primary hover:text-primary-foreground transition-all duration-300 ${
+            className={`fixed top-1/2 -translate-y-1/2 right-0 p-2 py-5 bg-white dark:bg-black border border-border border-r-0 rounded-l shadow-lg text-primary hover:text-primary-foreground transition-all duration-300 ${
               isAISidebarOpen ? "mr-64" : ""
             }`}
           >

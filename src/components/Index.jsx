@@ -2,10 +2,10 @@
 
 import { ReactFlowProvider } from 'reactflow';
 import React, { useState } from 'react';
-import Sidebar from '../components/Sidebar';
+import Sidebar from './LeftSidebar';
 import Board from '../components/Board';
 import { ThemeToggle } from '../components/ThemeToggle';
-import AISidebar from '../components/AISidebar';
+import AISidebar from './RightSidebar';
 import { Stars } from 'lucide-react';
 
 const Index = () => {
@@ -51,7 +51,7 @@ const Index = () => {
           </div>
           <button
             onClick={() => setIsAISidebarOpen(!isAISidebarOpen)}
-            className={`fixed top-1/2 -translate-y-1/2 right-0 p-2 bg-background border border-border rounded-l-lg shadow-lg text-primary hover:text-primary-foreground transition-all duration-300 ${isAISidebarOpen ? 'mr-64' : ''
+            className={`fixed top-1/2 -translate-y-1/2 right-0 p-2 bg-white dark:bg-black border border-border rounded-l-lg shadow-lg text-primary hover:text-primary-foreground transition-all duration-300 ${isAISidebarOpen ? 'mr-64' : ''
               }`}
           >
             <Stars size={20} />

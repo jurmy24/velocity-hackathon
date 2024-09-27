@@ -38,6 +38,7 @@ const Index = () => {
         onAddBoard={handleAddBoard}
         onSelectBoard={handleSelectBoard}
         onDeleteBoard={handleDeleteBoard}
+        selectedBoard={selectedBoard}
       />
       <div className="flex-grow relative">
         {selectedBoard && <Board board={selectedBoard} />}

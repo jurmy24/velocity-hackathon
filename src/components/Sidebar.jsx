@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { PlusCircle, Trash2 } from 'lucide-react';
 
-const Sidebar = ({ boards, onAddBoard, onSelectBoard, onDeleteBoard }) => {
+const Sidebar = ({ boards, onAddBoard, onSelectBoard, onDeleteBoard, selectedBoard }) => {
   const [newBoardName, setNewBoardName] = useState('');
 
   const handleAddBoard = () => {
@@ -21,7 +21,7 @@ const Sidebar = ({ boards, onAddBoard, onSelectBoard, onDeleteBoard }) => {
             type="text"
             value={newBoardName}
             onChange={(e) => setNewBoardName(e.target.value)}
-            className="flex-grow mr-2 px-2 py-1 border border-border rounded"
+            className="flex-grow mr-2 px-2 py-1 border border-border rounded text-black"
             placeholder="New board name"
           />
           <button onClick={handleAddBoard} className="text-primary hover:text-primary-foreground">
@@ -32,7 +32,9 @@ const Sidebar = ({ boards, onAddBoard, onSelectBoard, onDeleteBoard }) => {
           {boards.map((board) => (
             <li
               key={board.id}
-              className="flex items-center justify-between cursor-pointer hover:bg-accent hover:text-accent-foreground p-2 rounded"
+              className={`flex items-center justify-between cursor-pointer hover:bg-accent hover:text-accent-foreground p-2 rounded ${
+                selectedBoard && selectedBoard.id === board.id ? 'bg-accent text-accent-foreground' : ''
+              }`}
             >
               <span onClick={() => onSelectBoard(board.id)}>{board.name}</span>
               <button

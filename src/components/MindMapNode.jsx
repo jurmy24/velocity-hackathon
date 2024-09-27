@@ -1,18 +1,13 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { Handle, Position, useUpdateNodeInternals } from "@xyflow/react";
+import React, { useState, useCallback } from "react";
+import { Handle, Position } from "@xyflow/react";
 
-const NodeContent = ({ data, isConnectable, id }) => {
+function MindMapNode({ data, isConnectable }) {
   const [content, setContent] = useState(data.content || "");
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const [isEditing, setIsEditing] = useState(false);
-  const updateNodeInternals = useUpdateNodeInternals();
 
-  useEffect(() => {
-    updateNodeInternals(id);
-  }, [id, updateNodeInternals]);
-
-  const handleChange = useCallback((evt) => {
+  const onChange = useCallback((evt) => {
     setContent(evt.target.value);
   }, []);
 
@@ -43,84 +38,39 @@ const NodeContent = ({ data, isConnectable, id }) => {
     "Suggestion 3",
   ];
 
-  // Styles for the handles
-  const handleStyle = {
-    opacity: 3,
-    width: "6px",
-    height: "6px",
-    borderRadius: "50%",
-    border: "2px solid #ddd",
-    background: "#fff",
-    transition: "opacity 0.3s",
-  };
-
-  const onConnect = (params) => {
-    console.log("New connection:", params);
-    // Add any custom connection logic here
-  };
-
-  const isValidConnection = () => {
-    // Add any custom validation logic here
-    return true;
-  };
-
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 w-64 relative group">
+    <div className="bg-slate-300 dark:bg-slate-700 rounded border-1 border-black dark:border-white">
       <Handle
         id="top"
         type="source"
         position={Position.Top}
-        style={{ ...handleStyle, top: "-5px", left: "calc(50% - 5px)" }}
         isConnectable={isConnectable}
-        isConnectableStart={true}
-        isConnectableEnd={true}
-        onConnect={onConnect}
-        isValidConnection={isValidConnection}
-        className="group-hover:opacity-100 connecting"
       />
       <Handle
         id="right"
         type="source"
         position={Position.Right}
-        style={{ ...handleStyle, right: "-5px", top: "calc(50% - 5px)" }}
         isConnectable={isConnectable}
-        isConnectableStart={true}
-        isConnectableEnd={true}
-        onConnect={onConnect}
-        isValidConnection={isValidConnection}
-        className="group-hover:opacity-100 connecting"
       />
       <Handle
         id="bottom"
         type="source"
         position={Position.Bottom}
-        style={{ ...handleStyle, bottom: "-5px", left: "calc(50% - 5px)" }}
         isConnectable={isConnectable}
-        isConnectableStart={true}
-        isConnectableEnd={true}
-        onConnect={onConnect}
-        isValidConnection={isValidConnection}
-        className="group-hover:opacity-100 connecting"
       />
       <Handle
         id="left"
         type="source"
         position={Position.Left}
-        style={{ ...handleStyle, left: "-5px", top: "calc(50% - 5px)" }}
         isConnectable={isConnectable}
-        isConnectableStart={true}
-        isConnectableEnd={true}
-        onConnect={onConnect}
-        isValidConnection={isValidConnection}
-        className="group-hover:opacity-100 connecting"
       />
       <textarea
-        className="w-full h-24 p-2 border rounded resize-none"
+        className="my-1 mx-1 resize-none bg-slate-300 dark:bg-slate-700 text-black dark:text-white align-middle"
         value={content}
-        onChange={handleChange}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        placeholder="Write your idea here..."
+        onChange={onChange}
+        onFocus={handleFocus} // when pressing on it
+        onBlur={handleBlur} // when pressing away from it
+        placeholder="Ideas go here..."
       />
       {isEditing && showSuggestions && (
         <div className="suggestions-container absolute top-full left-0 mt-2 z-10">
@@ -137,6 +87,6 @@ const NodeContent = ({ data, isConnectable, id }) => {
       )}
     </div>
   );
-};
+}
 
-export default NodeContent;
+export default MindMapNode;

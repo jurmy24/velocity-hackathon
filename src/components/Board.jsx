@@ -1,13 +1,11 @@
 import React, { useState, useCallback } from "react";
 import {
   ReactFlow,
-  useNodesState,
-  useEdgesState,
   addEdge,
   Background,
-
-  // applyNodeChanges,
-  // applyEdgeChanges,
+  applyEdgeChanges,
+  applyNodeChanges,
+  MiniMap,
   useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
@@ -20,34 +18,63 @@ import {
   Maximize,
   Lock,
 } from "lucide-react";
-import NodeContent from "./MindMapNode";
-
-const nodeTypes = {
-  custom: NodeContent,
-};
+import MindMapNode from "./MindMapNode";
 
 const initialNodes = [
-  { id: "1", position: { x: 0, y: 0 }, data: { label: "1" } },
-  { id: "2", position: { x: 0, y: 100 }, data: { label: "2" } },
+  {
+    id: "1",
+    type: "user",
+    data: { label: "Input Node" },
+    position: { x: 250, y: 25 },
+    style: { backgroundColor: "#6ede87", color: "white" },
+  },
+  {
+    id: "2",
+    type: "user",
+    // you can also pass a React component as a label
+    data: { label: <div>Default Node</div> },
+    position: { x: 100, y: 125 },
+    style: { backgroundColor: "#ff0072", color: "white" },
+  },
+  {
+    id: "3",
+    type: "assistant",
+    data: { label: "Output Node" },
+    position: { x: 250, y: 250 },
+    style: { backgroundColor: "#6865A5", color: "white" },
+  },
 ];
-const initialEdges = [{ id: "e1-2", source: "1", target: "2" }];
+const initialEdges = [{ id: "e1-2", source: "1", target: "2" }]; // animated: true
+
+const nodeColor = (node) => {
+  switch (node.type) {
+    case "assistant":
+      return "#6ede87";
+    case "user":
+      return "#6865A5";
+    default:
+      return "#ff0072";
+  }
+};
+
+const nodeTypes = {
+  custom: MindMapNode,
+};
 
 const Board = ({ board }) => {
-  // const [nodes, setNodes] = useState(board.nodes || []);
-  // const [edges, setEdges] = useState(board.edges || []);
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, setNodes] = useState(initialNodes);
+  const [edges, setEdges] = useState(initialEdges);
 
-  // const onNodesChange = useCallback((changes) => {
-  //   setNodes((nds) => applyNodeChanges(changes, nds));
-  // }, []);
-
-  // const onEdgesChange = useCallback((changes) => {
-  //   setEdges((eds) => applyEdgeChanges(changes, eds));
-  // }, []);
-
+  const onNodesChange = useCallback(
+    (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
+    [setNodes]
+  );
+  const onEdgesChange = useCallback(
+    (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
+    [setEdges]
+  );
   const onConnect = useCallback(
-    (params) => setEdges((eds) => addEdge(params, eds)),
+    (connection) => setEdges((eds) => addEdge(connection, eds)),
     [setEdges]
   );
 
@@ -56,7 +83,6 @@ const Board = ({ board }) => {
     (content = "", x = Math.random() * 500, y = Math.random() * 500) => {
       const newNode = {
         id: (nodes.length + 1).toString(),
-        type: "custom",
         position: { x, y },
         data: {
           content,
@@ -168,6 +194,7 @@ const Board = ({ board }) => {
           <Lock size={20} />
         </button>
       </div>
+
       <ReactFlow
         nodes={nodes.map((node) => ({
           ...node,
@@ -182,20 +209,22 @@ const Board = ({ board }) => {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         fitView
-        panOnScroll
+        // panOnScroll
         selectionOnDrag
-        panOnDrag={!isLocked}
-        zoomOnScroll={!isLocked}
-        zoomOnPinch={!isLocked}
-        nodesDraggable={!isLocked}
-        nodesConnectable={!isLocked}
-        elementsSelectable={!isLocked}
+        // panOnDrag={!isLocked}
+        // zoomOnScroll={!isLocked}
+        // zoomOnPinch={!isLocked}
+        // nodesDraggable={!isLocked}
+        // nodesConnectable={!isLocked}
+        // elementsSelectable={!isLocked}
         minZoom={0.2}
         maxZoom={4}
         defaultViewport={{ x: 0, y: 0, zoom: 1 }}
         attributionPosition="bottom-left"
       >
-        <Background />
+        {/* <Controls /> */}
+        <MiniMap nodeColor={nodeColor} nodeStrokeWidth={3} zoomable pannable />
+        <Background variant="dots" gap={15} size={1} />
       </ReactFlow>
     </div>
   );

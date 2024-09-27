@@ -76,7 +76,7 @@ const Board = ({ board }) => {
           <MoreHorizontal size={20} />
         </button>
       </div>
-      <div className="z-50 absolute left-4 top-1/2 transform -translate-y-1/2 bg-background border border-border rounded-lg shadow-lg">
+      <div className="z-50 absolute left-4 top-1/2 transform -translate-y-1/2 bg-white dark:bg-black border border-border rounded-lg shadow-lg">
         <button
           className={`block p-2 hover:bg-accent hover:text-accent-foreground ${tool === 'select' ? 'bg-accent text-accent-foreground' : ''}`}
           onClick={() => setTool('select')}

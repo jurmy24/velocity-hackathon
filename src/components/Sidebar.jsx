@@ -1,13 +1,19 @@
-import React, { useState } from 'react';
-import { PlusCircle, Trash2 } from 'lucide-react';
+import React, { useState } from "react";
+import { PlusCircle, Trash2 } from "lucide-react";
 
-const Sidebar = ({ boards, onAddBoard, onSelectBoard, onDeleteBoard, selectedBoard }) => {
-  const [newBoardName, setNewBoardName] = useState('');
+const Sidebar = ({
+  boards,
+  onAddBoard,
+  onSelectBoard,
+  onDeleteBoard,
+  selectedBoard,
+}) => {
+  const [newBoardName, setNewBoardName] = useState("");
 
   const handleAddBoard = () => {
     if (newBoardName.trim()) {
       onAddBoard(newBoardName.trim());
-      setNewBoardName('');
+      setNewBoardName("");
     }
   };
 
@@ -24,7 +30,10 @@ const Sidebar = ({ boards, onAddBoard, onSelectBoard, onDeleteBoard, selectedBoa
             className="flex-grow mr-2 px-2 py-1 border border-border rounded text-black"
             placeholder="New board name"
           />
-          <button onClick={handleAddBoard} className="text-primary hover:text-primary-foreground">
+          <button
+            onClick={handleAddBoard}
+            className="text-primary hover:text-primary-foreground"
+          >
             <PlusCircle size={24} />
           </button>
         </div>
@@ -33,7 +42,9 @@ const Sidebar = ({ boards, onAddBoard, onSelectBoard, onDeleteBoard, selectedBoa
             <li
               key={board.id}
               className={`flex items-center justify-between cursor-pointer hover:bg-accent hover:text-accent-foreground p-2 rounded ${
-                selectedBoard && selectedBoard.id === board.id ? 'bg-accent text-accent-foreground' : ''
+                selectedBoard && selectedBoard.id === board.id
+                  ? "bg-accent text-accent-foreground"
+                  : ""
               }`}
             >
               <span onClick={() => onSelectBoard(board.id)}>{board.name}</span>
@@ -52,3 +63,4 @@ const Sidebar = ({ boards, onAddBoard, onSelectBoard, onDeleteBoard, selectedBoa
 };
 
 export default Sidebar;
+

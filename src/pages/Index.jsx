@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
-import Sidebar from '../components/Sidebar';
-import Board from '../components/Board';
-import { ThemeToggle } from '../components/ThemeToggle';
-import AISidebar from '../components/AISidebar';
-import { Stars } from 'lucide-react';
+"use client";
+
+import React, { useState } from "react";
+import Sidebar from "../components/Sidebar";
+import Board from "../components/Board";
+import { ThemeToggle } from "../components/ThemeToggle";
+import AISidebar from "../components/AISidebar";
+import { Stars } from "lucide-react";
 
 const Index = () => {
   const [boards, setBoards] = useState([
-    { id: 1, name: 'Hackathon', nodes: [], edges: [] },
-    { id: 2, name: 'Thesis', nodes: [], edges: [] },
+    { id: 1, name: "Hackathon", nodes: [], edges: [] },
+    { id: 2, name: "Thesis", nodes: [], edges: [] },
   ]);
   const [selectedBoard, setSelectedBoard] = useState(boards[0]);
   const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
@@ -48,15 +50,19 @@ const Index = () => {
         <button
           onClick={() => setIsAISidebarOpen(!isAISidebarOpen)}
           className={`fixed top-1/2 -translate-y-1/2 right-0 p-2 bg-background border border-border rounded-l-lg shadow-lg text-primary hover:text-primary-foreground transition-all duration-300 ${
-            isAISidebarOpen ? 'mr-64' : ''
+            isAISidebarOpen ? "mr-64" : ""
           }`}
         >
           <Stars size={20} />
         </button>
-        <AISidebar isOpen={isAISidebarOpen} onClose={() => setIsAISidebarOpen(false)} />
+        <AISidebar
+          isOpen={isAISidebarOpen}
+          onClose={() => setIsAISidebarOpen(false)}
+        />
       </div>
     </div>
   );
 };
 
 export default Index;
+

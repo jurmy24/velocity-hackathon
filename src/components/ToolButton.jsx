@@ -1,5 +1,5 @@
-import React from 'react';
-import { MousePointer, PlusCircle } from 'lucide-react';
+import React from "react";
+import { MousePointer, PlusCircle } from "lucide-react";
 
 const ToolButton = ({ onAddNode }) => {
   return (
@@ -7,7 +7,10 @@ const ToolButton = ({ onAddNode }) => {
       <button className="block p-2 hover:bg-accent hover:text-accent-foreground">
         <MousePointer size={20} />
       </button>
-      <button className="block p-2 hover:bg-accent hover:text-accent-foreground" onClick={onAddNode}>
+      <button
+        className="block p-2 hover:bg-accent hover:text-accent-foreground"
+        onClick={onAddNode}
+      >
         <PlusCircle size={20} />
       </button>
     </div>
@@ -15,3 +18,4 @@ const ToolButton = ({ onAddNode }) => {
 };
 
 export default ToolButton;
+

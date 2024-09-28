@@ -43,12 +43,6 @@ const Board = ({ board }) => {
         position: { x, y },
         data: {
           content,
-          suggestions: [
-            "New Suggestion 1",
-            "New Suggestion 2",
-            "New Suggestion 3",
-          ],
-          onSuggestionClick: handleSuggestionClick,
         },
       };
       setNodes((nds) => nds.concat(newNode));
@@ -178,4 +172,3 @@ const Board = ({ board }) => {
 };
 
 export default Board;
-

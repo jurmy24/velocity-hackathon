@@ -36,7 +36,7 @@ const NodeContent = ({ id, data, isConnectable }) => {
             };
           }
           return node;
-        }),
+        })
       );
 
       // Call the updateNode function from your API
@@ -44,7 +44,7 @@ const NodeContent = ({ id, data, isConnectable }) => {
         console.error(`Error updating node ${id} content:`, error);
       });
     },
-    [id, setNodes],
+    [id, setNodes]
   );
 
   const acceptSuggestion = () => {
@@ -52,8 +52,8 @@ const NodeContent = ({ id, data, isConnectable }) => {
     const updatedNode = { ...data, isSuggestion: false }; // Set isSuggestion to false to mark it as approved
     setNodes((nodes) =>
       nodes.map((node) =>
-        node.id === data.id ? { ...node, data: updatedNode } : node,
-      ),
+        node.id === data.id ? { ...node, data: updatedNode } : node
+      )
     );
     setShowSuggestions(false);
   };
@@ -70,9 +70,15 @@ const NodeContent = ({ id, data, isConnectable }) => {
     // In a real application, you would call your API or LLM here
     // For now, we'll use mock data
     const mockSuggestions = [
-      { content: "Suggestion 1 content" },
-      { content: "Suggestion 2 content" },
-      { content: "Suggestion 3 content" },
+      { content: "RAG-powered bot with access to the ArXiv database" },
+      {
+        content:
+          "AI-powered virtual research assistant for real-time data analysis",
+      },
+      {
+        content:
+          "Voice-activated research assistant for hands-free project guidance",
+      },
     ];
 
     const newNodes = mockSuggestions.map((suggestion, index) => {
@@ -85,6 +91,7 @@ const NodeContent = ({ id, data, isConnectable }) => {
           x: currentNode.position.x + Math.cos(angle) * radius,
           y: currentNode.position.y + Math.sin(angle) * radius,
         },
+        animated: true,
         data: {
           content: suggestion.content,
           isSuggestion: true,

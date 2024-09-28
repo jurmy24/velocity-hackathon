@@ -99,15 +99,15 @@ const Board = ({ board: initialBoard }) => {
           // Remove any edges connected to this node
           setEdges((prevEdges) =>
             prevEdges.filter(
-              (edge) => edge.source !== node.id && edge.target !== node.id,
-            ),
+              (edge) => edge.source !== node.id && edge.target !== node.id
+            )
           );
         } catch (error) {
           console.error(`Error deleting node ${node.id}:`, error);
         }
       }
     },
-    [setNodes, setEdges],
+    [setNodes, setEdges]
   );
 
   const onNodesChange = useCallback((changes) => {
@@ -135,7 +135,7 @@ const Board = ({ board: initialBoard }) => {
 
   const onEdgesChange = useCallback(
     (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
-    [setEdges],
+    [setEdges]
   );
 
   const onConnect = useCallback(
@@ -156,14 +156,14 @@ const Board = ({ board: initialBoard }) => {
         // Persist the connection to the database
         const newConnection = await createNodeConnection(
           parseInt(connection.source),
-          parseInt(connection.target),
+          parseInt(connection.target)
         );
 
         // Update the edge with the real ID from the database
         setEdges((eds) =>
           eds.map((edge) =>
-            edge.id === tempId ? { ...edge, id: `e${newConnection.id}` } : edge,
-          ),
+            edge.id === tempId ? { ...edge, id: `e${newConnection.id}` } : edge
+          )
         );
       } catch (error) {
         console.error("Error creating node connection:", error);
@@ -171,7 +171,7 @@ const Board = ({ board: initialBoard }) => {
         setEdges((eds) => eds.filter((edge) => edge.id !== tempId));
       }
     },
-    [setEdges],
+    [setEdges]
   );
 
   const onEdgesDelete = useCallback(
@@ -188,7 +188,7 @@ const Board = ({ board: initialBoard }) => {
         }
       }
     },
-    [setEdges],
+    [setEdges]
   );
 
   const { zoomIn, zoomOut } = useReactFlow();
@@ -233,7 +233,7 @@ const Board = ({ board: initialBoard }) => {
         console.error("Error creating node:", error);
       }
     },
-    [],
+    []
   );
 
   const handleFullScreen = useCallback(() => {

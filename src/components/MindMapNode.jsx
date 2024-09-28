@@ -57,9 +57,16 @@ const NodeContent = ({ id, data, isConnectable }) => {
   };
 
   const streamContent = (node, fullContent) => {
-    let index = 0;
-    const interval = setInterval(() => {
-      if (index <= fullContent.length) {
+    const words = fullContent.split(/\s+/);
+    let currentIndex = 0;
+
+    const streamChunk = () => {
+      if (currentIndex < words.length) {
+        const chunkSize = Math.floor(Math.random() * 3) + 1; // Random chunk size between 1 and 3 words
+        const newChunk = words
+          .slice(currentIndex, currentIndex + chunkSize)
+          .join(" ");
+
         setNodes((prevNodes) =>
           prevNodes.map((n) =>
             n.id === node.id
@@ -67,17 +74,25 @@ const NodeContent = ({ id, data, isConnectable }) => {
                   ...n,
                   data: {
                     ...n.data,
-                    content: fullContent.slice(0, index),
+                    content: n.data.content
+                      ? n.data.content + " " + newChunk
+                      : newChunk,
                   },
                 }
               : n,
           ),
         );
-        index++;
-      } else {
-        clearInterval(interval);
+        currentIndex += chunkSize;
+
+        // Randomize the delay between chunks
+        const delay = Math.random() * (100 - 50) + 100; // Random delay between 100ms and 300ms
+        setTimeout(streamChunk, delay);
       }
-    }, 20); // Adjust the interval for faster or slower typing effect
+    };
+
+    // Start the streaming process with an initial delay
+    const initialDelay = Math.random() * (1000 - 500) + 500; // Random delay between 500ms and 1000ms
+    setTimeout(streamChunk, initialDelay);
   };
 
   const handleStarClick = useCallback(() => {
@@ -90,14 +105,17 @@ const NodeContent = ({ id, data, isConnectable }) => {
     }
 
     const mockSuggestions = [
-      { content: "RAG-powered bot with access to the ArXiv database" },
       {
         content:
-          "AI-powered virtual research assistant for real-time data analysis",
+          "RAG-powered bot with access to the ArXiv database for real-time scientific research assistance",
       },
       {
         content:
-          "Voice-activated research assistant for hands-free project guidance",
+          "AI-powered virtual research assistant capable of data analysis, literature review, and hypothesis generation",
+      },
+      {
+        content:
+          "Voice-activated research assistant for hands-free project guidance and experimental protocol optimization",
       },
     ];
 
@@ -121,13 +139,11 @@ const NodeContent = ({ id, data, isConnectable }) => {
 
     setNodes((prevNodes) => [...prevNodes, ...newNodes]);
 
-    setTimeout(() => {
-      newNodes.forEach((node, index) => {
-        const randomSuggestion =
-          mockSuggestions[Math.floor(Math.random() * mockSuggestions.length)];
-        streamContent(node, randomSuggestion.content);
-      });
-    }, 1000);
+    newNodes.forEach((node) => {
+      const randomSuggestion =
+        mockSuggestions[Math.floor(Math.random() * mockSuggestions.length)];
+      streamContent(node, randomSuggestion.content);
+    });
 
     const newEdges = newNodes.map((node) => ({
       id: `edge-${id}-${node.id}`,

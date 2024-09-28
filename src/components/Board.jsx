@@ -1,4 +1,6 @@
-import React, { useState, useCallback } from "react";
+"use client";
+
+import React, { useState, useEffect, useCallback } from "react";
 import {
   ReactFlow,
   addEdge,
@@ -16,50 +18,172 @@ import {
   ZoomIn,
   ZoomOut,
   Maximize,
-  Lock,
 } from "lucide-react";
 import NodeContent from "./MindMapNode";
+import { createNode, deleteNode, updateNode } from "@/app/api/node";
+import { getBoardWithNodes } from "@/app/api/board";
 
 const nodeTypes = {
   custom: NodeContent,
 };
 
-const Board = ({ board }) => {
-  const [nodes, setNodes] = useState(board.nodes || []);
-  const [edges, setEdges] = useState(board.nodes?.connections || []);
+const Board = ({ board: initialBoard }) => {
+  const [nodes, setNodes] = useState([]);
+  const [edges, setEdges] = useState([]);
+  const [board, setBoard] = useState(initialBoard);
+  const [currentBoardId, setCurrentBoardId] = useState(initialBoard?.id);
 
-  const onNodesChange = useCallback(
-    (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
-    [setNodes]
+  console.log("Rendering Board component with initialBoard:", initialBoard);
+
+  useEffect(() => {
+    if (initialBoard?.id !== currentBoardId) {
+      setCurrentBoardId(initialBoard?.id);
+    }
+  }, [initialBoard, currentBoardId]);
+
+  useEffect(() => {
+    const fetchBoardData = async () => {
+      if (currentBoardId) {
+        try {
+          const fetchedBoard = await getBoardWithNodes(currentBoardId);
+          if (fetchedBoard) {
+            setBoard(fetchedBoard);
+            const formattedNodes = fetchedBoard.nodes.map((node) => ({
+              id: node.id.toString(),
+              type: "custom",
+              position: { x: parseFloat(node.xPos), y: parseFloat(node.yPos) },
+              data: { label: node.title, content: node.content },
+            }));
+            setNodes(formattedNodes);
+            setEdges(fetchedBoard.connections || []);
+          } else {
+            setNodes([]);
+            setEdges([]);
+          }
+        } catch (error) {
+          console.error("Error fetching board data:", error);
+          setNodes([]);
+          setEdges([]);
+        }
+      } else {
+        console.log("No board ID available, clearing nodes and edges");
+        setNodes([]);
+        setEdges([]);
+      }
+    };
+
+    fetchBoardData();
+  }, [currentBoardId]);
+
+  const onNodesDelete = useCallback(
+    async (deletedNodes) => {
+      for (const node of deletedNodes) {
+        try {
+          await deleteNode(parseInt(node.id));
+          console.log(`Node ${node.id} deleted from database`);
+
+          setNodes((prevNodes) => prevNodes.filter((n) => n.id !== node.id));
+
+          // Remove any edges connected to this node
+          setEdges((prevEdges) =>
+            prevEdges.filter(
+              (edge) => edge.source !== node.id && edge.target !== node.id,
+            ),
+          );
+        } catch (error) {
+          console.error(`Error deleting node ${node.id}:`, error);
+        }
+      }
+    },
+    [setNodes, setEdges],
   );
+
+  const onNodesChange = useCallback((changes) => {
+    setNodes((prevNodes) => {
+      const newNodes = applyNodeChanges(changes, prevNodes);
+
+      changes.forEach((change) => {
+        const node = newNodes.find((n) => n.id === change.id);
+        if (!node) return;
+
+        if (change.type === "position" && change.dragging === false) {
+          // Node dragging has ended, update the position in the database
+          updateNode(parseInt(node.id), {
+            xPos: node.position.x,
+            yPos: node.position.y,
+          }).catch((error) => {
+            console.error(`Error updating node ${node.id} position:`, error);
+          });
+        } else if (change.type === "data") {
+          // Content has changed, update in the database
+          // Assuming the content is stored in data.content
+          if ("content" in change.data) {
+            updateNode(parseInt(node.id), {
+              content: change.data.content,
+            }).catch((error) => {
+              console.error(`Error updating node ${node.id} content:`, error);
+            });
+          }
+        }
+      });
+
+      return newNodes;
+    });
+  }, []);
 
   const onEdgesChange = useCallback(
     (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
-    [setEdges]
+    [setEdges],
   );
 
   const onConnect = useCallback(
     (connection) => setEdges((eds) => addEdge(connection, eds)),
-    [setEdges]
+    [setEdges],
   );
 
   const { zoomIn, zoomOut } = useReactFlow();
 
-  // 
-
   const handleAddNode = useCallback(
-    (id = (nodes.length + 1).toString(), content = "", x = Math.random() * 500, y = Math.random() * 500) => {
-      const newNode = {
-        id: id,
-        type: "custom",
-        position: { x, y },
-        data: {
+    async ({
+      authorId = 1,
+      boardId,
+      title = "",
+      content = "",
+      xPos = Math.random() * 500,
+      yPos = Math.random() * 500,
+    }) => {
+      try {
+        const dbNode = await createNode({
+          authorId,
+          boardId,
+          title,
           content,
-        },
-      };
-      setNodes((nds) => nds.concat(newNode));
+          xPos,
+          yPos,
+        });
+
+        const newNode = {
+          id: dbNode.id.toString(), // Ensure id is a string
+          type: "custom",
+          position: { x: parseFloat(dbNode.xPos), y: parseFloat(dbNode.yPos) },
+          data: {
+            label: title, // ReactFlow often expects a 'label' property
+            content: content,
+          },
+        };
+
+        console.log("Adding new node:", newNode); // For debugging
+
+        setNodes((prevNodes) => {
+          const updatedNodes = [...prevNodes, newNode];
+          console.log("Updated nodes:", updatedNodes); // For debugging
+          return updatedNodes;
+        });
+      } catch (error) {
+        console.error("Error creating node:", error);
+      }
     },
-    [nodes, setNodes],
+    [],
   );
 
   const handleFullScreen = useCallback(() => {
@@ -70,13 +194,6 @@ const Board = ({ board }) => {
   //   setIsLocked(!isLocked);
   // }, [isLocked]);
 
-  if (!board) {
-    return (
-      <div className="flex-grow flex items-center justify-center">
-        Select a board to get started
-      </div>
-    );
-  }
   return (
     <div className="w-full h-full relative">
       <div className="absolute top-4 left-4 z-10 flex items-center bg-background/80 backdrop-blur-sm rounded-lg px-4 py-2">
@@ -94,7 +211,7 @@ const Board = ({ board }) => {
         <button
           className={`block p-2 hover:bg-accent hover:text-accent-foreground`}
           onClick={() => {
-            handleAddNode();
+            handleAddNode({ boardId: board.id, title: "test" });
           }}
         >
           <PlusCircle size={20} />
@@ -125,17 +242,12 @@ const Board = ({ board }) => {
         </button> */}
       </div>
       <ReactFlow
-        nodes={nodes.map((node) => ({
-          ...node,
-          data: {
-            ...node.data,
-            handleAddNode,
-          },
-        }))}
+        nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
+        onNodesDelete={onNodesDelete}
         onConnect={onConnect}
         fitView
         // panOnScroll

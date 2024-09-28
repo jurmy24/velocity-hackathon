@@ -49,7 +49,16 @@ export const deleteBoard = async (id: number): Promise<Board> => {
 export const getBoardWithNodes = async (id: number): Promise<Board | null> => {
   return prisma.board.findUnique({
     where: { id },
-    include: { nodes: true },
+    include: {
+      nodes: {
+        select: {
+          id: true,
+          title: true,
+          xPos: true,
+          yPos: true,
+        },
+      },
+    },
   });
 };
 

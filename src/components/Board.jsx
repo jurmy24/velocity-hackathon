@@ -91,15 +91,15 @@ const Board = ({ board: initialBoard }) => {
           // Remove any edges connected to this node
           setEdges((prevEdges) =>
             prevEdges.filter(
-              (edge) => edge.source !== node.id && edge.target !== node.id,
-            ),
+              (edge) => edge.source !== node.id && edge.target !== node.id
+            )
           );
         } catch (error) {
           console.error(`Error deleting node ${node.id}:`, error);
         }
       }
     },
-    [setNodes, setEdges],
+    [setNodes, setEdges]
   );
 
   const onNodesChange = useCallback((changes) => {
@@ -127,7 +127,7 @@ const Board = ({ board: initialBoard }) => {
 
   const onEdgesChange = useCallback(
     (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
-    [setEdges],
+    [setEdges]
   );
 
   const onConnect = useCallback(
@@ -138,10 +138,10 @@ const Board = ({ board: initialBoard }) => {
             ...connection,
             type: "floating",
           },
-          eds,
-        ),
+          eds
+        )
       ),
-    [setEdges],
+    [setEdges]
   );
 
   const { zoomIn, zoomOut } = useReactFlow();
@@ -186,7 +186,7 @@ const Board = ({ board: initialBoard }) => {
         console.error("Error creating node:", error);
       }
     },
-    [],
+    []
   );
 
   const handleFullScreen = useCallback(() => {

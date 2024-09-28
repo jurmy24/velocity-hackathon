@@ -3,6 +3,8 @@ import { Stars } from "lucide-react";
 import Chat from "./Chat"; // Import the new Chat component
 
 const AISidebar = ({ board, isOpen, onClose }) => {
+  console.log("Board ID: ", board.id);
+
   return (
     <div
       className={`fixed top-0 right-0 bg-white dark:bg-black h-full w-96 bg-background border-l border-border transform transition-transform duration-300 ease-in-out ${
@@ -20,7 +22,7 @@ const AISidebar = ({ board, isOpen, onClose }) => {
           <h2 className="text-lg font-semibold">AI Assistant</h2>
         </div>
         <div className="flex-grow overflow-hidden">
-          <Chat />
+          <Chat board={board} />
         </div>
       </div>
     </div>

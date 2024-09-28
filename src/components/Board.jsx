@@ -7,6 +7,7 @@ import {
   applyEdgeChanges,
   useReactFlow,
   MiniMap,
+  ConnectionMode,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import {
@@ -19,9 +20,14 @@ import {
   Lock,
 } from "lucide-react";
 import NodeContent from "./MindMapNode";
+import SimpleFloatingEdge from "./SimpleFloatingEdge";
 
 const nodeTypes = {
   custom: NodeContent,
+};
+
+const edgeTypes = {
+  floating: SimpleFloatingEdge,
 };
 
 const Board = ({ board }) => {
@@ -39,7 +45,9 @@ const Board = ({ board }) => {
   );
 
   const onConnect = useCallback(
-    (connection) => setEdges((eds) => addEdge(connection, eds)),
+    (connection) => setEdges((eds) => addEdge({
+      ...connection, type: "floating"
+    }, eds)),
     [setEdges]
   );
 
@@ -135,6 +143,7 @@ const Board = ({ board }) => {
         }))}
         edges={edges}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
@@ -151,6 +160,7 @@ const Board = ({ board }) => {
         maxZoom={4}
         defaultViewport={{ x: 0, y: 0, zoom: 1 }}
         attributionPosition="bottom-left"
+        connectionMode={ConnectionMode.Loose}
       >
         <Background variant="dots" gap={15} size={1} />
         <MiniMap nodeStrokeWidth={3} zoomable pannable />

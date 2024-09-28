@@ -53,7 +53,7 @@ export const getBoardWithNodes = async (id: number): Promise<Board | null> => {
       nodes: {
         select: {
           id: true,
-          title: true,
+          content: true,
           xPos: true,
           yPos: true,
         },

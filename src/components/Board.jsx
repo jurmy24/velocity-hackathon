@@ -33,8 +33,6 @@ const Board = ({ board: initialBoard }) => {
   const [board, setBoard] = useState(initialBoard);
   const [currentBoardId, setCurrentBoardId] = useState(initialBoard?.id);
 
-  console.log("Rendering Board component with initialBoard:", initialBoard);
-
   useEffect(() => {
     if (initialBoard?.id !== currentBoardId) {
       setCurrentBoardId(initialBoard?.id);
@@ -52,8 +50,9 @@ const Board = ({ board: initialBoard }) => {
               id: node.id.toString(),
               type: "custom",
               position: { x: parseFloat(node.xPos), y: parseFloat(node.yPos) },
-              data: { label: node.title, content: node.content },
+              data: { content: node.content },
             }));
+            console.log("Formatted Nodes: ", formattedNodes);
             setNodes(formattedNodes);
             setEdges(fetchedBoard.connections || []);
           } else {
@@ -105,6 +104,7 @@ const Board = ({ board: initialBoard }) => {
       changes.forEach((change) => {
         const node = newNodes.find((n) => n.id === change.id);
         if (!node) return;
+        console.log("Change: ", change);
 
         if (change.type === "position" && change.dragging === false) {
           // Node dragging has ended, update the position in the database
@@ -118,6 +118,7 @@ const Board = ({ board: initialBoard }) => {
           // Content has changed, update in the database
           // Assuming the content is stored in data.content
           if ("content" in change.data) {
+            console.log("Content changed to: ", change.data);
             updateNode(parseInt(node.id), {
               content: change.data.content,
             }).catch((error) => {

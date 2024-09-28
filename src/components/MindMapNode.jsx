@@ -1,9 +1,14 @@
 import React, { useState, useCallback } from "react";
 import {
-  Handle, Position, useReactFlow, NodeToolbar, useStore
+  Handle,
+  Position,
+  useReactFlow,
+  NodeToolbar,
+  useStore,
 } from "@xyflow/react";
 import CenteredExpandingTextArea from "./CenteredExpandingTextArea";
 import ResponsiveStar from "./ResponsiveStar";
+import { updateNode } from "@/app/api/node";
 
 const NodeContent = ({ data, isConnectable }) => {
   const [content, setContent] = useState(data.content || "");
@@ -12,9 +17,26 @@ const NodeContent = ({ data, isConnectable }) => {
   const [isHovered, setIsHovered] = useState(false);
   const zoom = useStore((state) => state.transform[2]);
 
-  const handleChange = useCallback((evt) => {
-    setContent(evt.target.value);
-  }, []);
+  // const handleChange = useCallback(
+  //   (evt) => {
+  //     const newContent = evt.target.value;
+  //     console.log(data.nodeId);
+  //     setNodes((nds) =>
+  //       nds.map((node) => {
+  //         if (node.id === data.id) {
+  //           node.data = { ...node.data, content: newContent };
+  //         }
+  //         return node;
+  //       }),
+  //     );
+  //
+  //     // Call the updateNode function from your API
+  //     updateNode(parseInt(data.id), { content: newContent }).catch((error) => {
+  //       console.error(`Error updating node ${data.id} content:`, error);
+  //     });
+  //   },
+  //   [data.id, setNodes],
+  // );
 
   const handleStarClick = () => {
     setShowSuggestions(true);
@@ -22,25 +44,51 @@ const NodeContent = ({ data, isConnectable }) => {
 
     // calls db
     const mockResult = [
-      { id: "a12332", boardId: data.boardId, author: {}, authorId: 1, board: {}, createAt: "", updatedAt: "", title: "Suggestion 1", content: "Suggestion 1 content", xPos: currentNode.position.x + 100, yPos: currentNode.position.y, isSuggestion: true },
-      { id: "q123213", boardId: data.boardId, author: {}, authorId: 1, board: {}, createAt: "", updatedAt: "", title: "Suggestion 2", content: "Suggestion 2 content", xPos: currentNode.position.x + 100, yPos: currentNode.position.y, isSuggestion: false }
-    ]
+      {
+        id: "a12332",
+        boardId: data.boardId,
+        author: {},
+        authorId: 1,
+        board: {},
+        createAt: "",
+        updatedAt: "",
+        title: "Suggestion 1",
+        content: "Suggestion 1 content",
+        xPos: currentNode.position.x + 100,
+        yPos: currentNode.position.y,
+        isSuggestion: true,
+      },
+      {
+        id: "q123213",
+        boardId: data.boardId,
+        author: {},
+        authorId: 1,
+        board: {},
+        createAt: "",
+        updatedAt: "",
+        title: "Suggestion 2",
+        content: "Suggestion 2 content",
+        xPos: currentNode.position.x + 100,
+        yPos: currentNode.position.y,
+        isSuggestion: false,
+      },
+    ];
 
     const newNodes = mockResult
-      .filter(x => x.isSuggestion === true)
-      .map(n => ({
+      .filter((x) => x.isSuggestion === true)
+      .map((n) => ({
         id: n.id,
         type: "custom",
         data: { content: n.content, id: n.id, isSuggestion: true },
         position: {
           x: n.xPos,
-          y: n.yPos
+          y: n.yPos,
         },
       }));
 
-    console.log(newNodes)
+    console.log(newNodes);
     if (newNodes?.length > 0) {
-      setNodes(prevNodes => [...prevNodes, ...newNodes]);
+      setNodes((prevNodes) => [...prevNodes, ...newNodes]);
     }
 
     // Automatically add an edge between the current node and each new node
@@ -60,7 +108,6 @@ const NodeContent = ({ data, isConnectable }) => {
     // call llm
 
     // add nodes
-
   };
 
   const handleNodeMouseLeave = (e) => {
@@ -68,9 +115,7 @@ const NodeContent = ({ data, isConnectable }) => {
     if (e === undefined) {
       return;
     }
-    if (
-      !e.relatedTarget
-    ) {
+    if (!e.relatedTarget) {
       setShowSuggestions(false);
     }
   };
@@ -94,9 +139,10 @@ const NodeContent = ({ data, isConnectable }) => {
   return (
     <div
       className={`rounded shadow-md p-4 w-50 h-auto relative transition-colors duration-200
-        ${data.isSuggestion
-          ? "bg-gray-100 dark:bg-gray-700 opacity-80"
-          : "bg-white dark:bg-gray-800"
+        ${
+          data.isSuggestion
+            ? "bg-gray-100 dark:bg-gray-700 opacity-80"
+            : "bg-white dark:bg-gray-800"
         }
         border border-gray-200 dark:border-gray-600
       `}
@@ -110,7 +156,9 @@ const NodeContent = ({ data, isConnectable }) => {
         className="w-3 h-3 bg-blue-500 dark:bg-blue-400"
       />
       <NodeToolbar
-        isVisible={!data.isSuggestion && (isHovered || data.forceToolbarVisible)}
+        isVisible={
+          !data.isSuggestion && (isHovered || data.forceToolbarVisible)
+        }
         position={{ y: -40 }}
         className="bg-white dark:bg-gray-700 rounded p-1 flex items-center border border-gray-200 dark:border-gray-600 shadow-lg transition-colors duration-200"
         align="end"
@@ -141,4 +189,3 @@ const NodeContent = ({ data, isConnectable }) => {
 };
 
 export default NodeContent;
-

@@ -28,8 +28,8 @@ model Node {
   updatedAt     DateTime         @updatedAt
   title         String           @db.VarChar(255)
   content       String?
-  xPos          Int
-  yPos          Int
+  xPos          Int?
+  yPos          Int?
   connectedTo   Node[]           @relation("NodeConnections")
   connectedFrom Node[]           @relation("NodeConnections")
   connections   NodeConnection[]

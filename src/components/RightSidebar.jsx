@@ -1,6 +1,6 @@
 import React from "react";
 import { Stars } from "lucide-react";
-import Chat from "./Chat"; // Import the new Chat component
+import Chat from "./Chat";
 
 const AISidebar = ({ board, isOpen, onClose }) => {
   return (
@@ -20,7 +20,7 @@ const AISidebar = ({ board, isOpen, onClose }) => {
           <h2 className="text-lg font-semibold">AI Assistant</h2>
         </div>
         <div className="flex-grow overflow-hidden">
-          <Chat boardId={board?.id} />
+          {board && <Chat boardId={board.id} />}
         </div>
       </div>
     </div>

@@ -7,8 +7,11 @@ import { getBoardWithNodes } from "@/app/api/board";
 
 const Chat = ({ boardId }) => {
   const [formattedNodes, setFormattedNodes] = useState([]);
+  const chatId = `chat-${boardId}`;
+
   const { messages, input, handleInputChange, handleSubmit, setMessages } =
     useChat({
+      id: chatId,
       initialMessages: [
         {
           role: "system",
@@ -16,7 +19,9 @@ const Chat = ({ boardId }) => {
             "You are a chatbot called MindFlow who is an expert on brainstorming. You are provided a bunch of nodes with content and connections and you help the user with more ideas.",
         },
       ],
+      api: "/api/chat",
     });
+
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -41,7 +46,7 @@ const Chat = ({ boardId }) => {
           // Update the system message with the new formatted nodes
           const systemMessage = {
             role: "system",
-            content: `You are a chatbot called MindFlow who is an expert on brainstorming. Here are the current nodes in the mindmap:
+            content: `You are a chatbot called MindFlow who is an expert on brainstorming. Here are the current nodes in the mindmap for board ${boardId}:
             ${newFormattedNodes.map((node) => `Node ${node.id}: ${node.data.content}`).join("\n")}
             
             Use this information to provide context-aware suggestions and help the user with more ideas.`,

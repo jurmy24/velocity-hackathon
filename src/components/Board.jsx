@@ -57,9 +57,9 @@ const Board = ({ board }) => {
           content,
         },
       };
-      setNodes((nds) => nds.concat(newNode));
+      setNodes((prevNodes) => [...prevNodes, newNode]);
     },
-    [nodes, setNodes],
+    [nodes],
   );
 
   const handleFullScreen = useCallback(() => {

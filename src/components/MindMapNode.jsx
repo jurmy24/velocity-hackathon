@@ -10,6 +10,7 @@ import CenteredExpandingTextArea from "./CenteredExpandingTextArea";
 import ResponsiveStar from "./ResponsiveStar";
 import { CircleCheckBig } from "lucide-react";
 import { updateNode } from "@/app/api/node";
+import { getSuggestionsNodes } from "@/app/api/node/route"
 
 const NodeContent = ({ id, data, isConnectable }) => {
   const [content, setContent] = useState(data.content || "");
@@ -69,14 +70,10 @@ const NodeContent = ({ id, data, isConnectable }) => {
 
     // In a real application, you would call your API or LLM here
     // For now, we'll use mock data
-    const mockSuggestions = [
-      { content: "Suggestion 1 content" },
-      { content: "Suggestion 2 content" },
-      { content: "Suggestion 3 content" },
-    ];
+    const llmSuggestion = getSuggestionsNodes(currentNode)
 
-    const newNodes = mockSuggestions.map((suggestion, index) => {
-      const angle = (index / mockSuggestions.length) * 2 * Math.PI;
+    const newNodes = llmSuggestion.map((suggestion, index) => {
+      const angle = (index / llmSuggestion.length) * 2 * Math.PI;
       const radius = 200; // Distance from the current node
       return {
         id: `suggestion-${id}-${index}`,
@@ -144,10 +141,9 @@ const NodeContent = ({ id, data, isConnectable }) => {
   return (
     <div
       className={`rounded shadow-md p-4 w-50 h-auto relative transition-colors duration-200
-        ${
-          data.isSuggestion
-            ? "bg-gray-100 dark:bg-gray-500"
-            : "bg-white dark:bg-gray-800"
+        ${data.isSuggestion
+          ? "bg-gray-100 dark:bg-gray-500"
+          : "bg-white dark:bg-gray-800"
         }
         border border-gray-200 dark:border-gray-600
       `}

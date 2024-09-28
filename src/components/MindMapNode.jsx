@@ -44,35 +44,11 @@ const NodeContent = ({ data, isConnectable }) => {
 
     // calls db
     const mockResult = [
-      {
-        id: "a12332",
-        boardId: data.boardId,
-        author: {},
-        authorId: 1,
-        board: {},
-        createAt: "",
-        updatedAt: "",
-        title: "Suggestion 1",
-        content: "Suggestion 1 content",
-        xPos: currentNode.position.x + 100,
-        yPos: currentNode.position.y,
-        isSuggestion: true,
-      },
-      {
-        id: "q123213",
-        boardId: data.boardId,
-        author: {},
-        authorId: 1,
-        board: {},
-        createAt: "",
-        updatedAt: "",
-        title: "Suggestion 2",
-        content: "Suggestion 2 content",
-        xPos: currentNode.position.x + 100,
-        yPos: currentNode.position.y,
-        isSuggestion: false,
-      },
-    ];
+      { id: "a12332", boardId: data.boardId, author: {}, authorId: 1, board: {}, createAt: "", updatedAt: "", title: "Suggestion 1", content: "Suggestion 1 content", xPos: currentNode.position.x + 100, yPos: currentNode.position.y + 10, isSuggestion: true },
+      { id: "a12331", boardId: data.boardId, author: {}, authorId: 1, board: {}, createAt: "", updatedAt: "", title: "Suggestion 2", content: "Suggestion 2 content", xPos: currentNode.position.x - 100, yPos: currentNode.position.y - 20, isSuggestion: true },
+      { id: "a12334", boardId: data.boardId, author: {}, authorId: 1, board: {}, createAt: "", updatedAt: "", title: "Suggestion 3", content: "Suggestion 3 content", xPos: currentNode.position.x - 50, yPos: currentNode.position.y - 30, isSuggestion: true },
+      { id: "q123213", boardId: data.boardId, author: {}, authorId: 1, board: {}, createAt: "", updatedAt: "", title: "Suggestion 2", content: "Suggestion 2 content", xPos: currentNode.position.x + 100, yPos: currentNode.position.y, isSuggestion: false }
+    ]
 
     const newNodes = mockResult
       .filter((x) => x.isSuggestion === true)
@@ -93,9 +69,11 @@ const NodeContent = ({ data, isConnectable }) => {
 
     // Automatically add an edge between the current node and each new node
     const newEdges = newNodes.map((n) => ({
-      id: `edge-${data.id}-${n.id}`, // Unique ID for each edge
-      source: data.id, // Source is the current node
-      target: n.id, // Target is the newly added node
+      id: `edge-${data.id}-${n.id}`,
+      source: data.id,
+      target: n.id,
+      animated: true,
+      type: "floating"
     }));
 
     setEdges((prevEdges) => [...prevEdges, ...newEdges]);
@@ -139,22 +117,25 @@ const NodeContent = ({ data, isConnectable }) => {
   return (
     <div
       className={`rounded shadow-md p-4 w-50 h-auto relative transition-colors duration-200
-        ${
-          data.isSuggestion
-            ? "bg-gray-100 dark:bg-gray-700 opacity-80"
-            : "bg-white dark:bg-gray-800"
+        ${data.isSuggestion
+          ? "bg-gray-100 dark:bg-gray-500"
+          : "bg-white dark:bg-gray-800"
         }
         border border-gray-200 dark:border-gray-600
       `}
       onMouseEnter={handleNodeMouseEnter}
       onMouseLeave={handleNodeMouseLeave}
     >
-      <Handle
+      <Handle type="source" position={Position.Top} id="a" />
+      <Handle type="source" position={Position.Right} id="b" />
+      <Handle type="source" position={Position.Bottom} id="c" />
+      <Handle type="source" position={Position.Left} id="d" />
+      {/* <Handle
         type="target"
         position={Position.Top}
         isConnectable={isConnectable}
         className="w-3 h-3 bg-blue-500 dark:bg-blue-400"
-      />
+      /> */}
       <NodeToolbar
         isVisible={
           !data.isSuggestion && (isHovered || data.forceToolbarVisible)
@@ -179,11 +160,11 @@ const NodeContent = ({ data, isConnectable }) => {
         readOnly={data.isSuggestion}
         isSuggestion={data.isSuggestion}
       />
-      <Handle
+      {/* <Handle
         type="source"
         position={Position.Bottom}
         isConnectable={isConnectable}
-      />
+      /> */}
     </div>
   );
 };

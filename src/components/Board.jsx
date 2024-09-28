@@ -9,6 +9,7 @@ import {
   applyEdgeChanges,
   useReactFlow,
   MiniMap,
+  ConnectionMode,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import {
@@ -22,6 +23,7 @@ import {
 import NodeContent from "./MindMapNode";
 import { createNode, deleteNode, updateNode } from "@/app/api/node";
 import { getBoardWithNodes } from "@/app/api/board";
+import SimpleFloatingEdge from "./SimpleFloatingEdge";
 
 const nodeTypes = {
   custom: NodeContent,
@@ -32,6 +34,13 @@ const Board = ({ board: initialBoard }) => {
   const [edges, setEdges] = useState([]);
   const [board, setBoard] = useState(initialBoard);
   const [currentBoardId, setCurrentBoardId] = useState(initialBoard?.id);
+const edgeTypes = {
+  floating: SimpleFloatingEdge,
+};
+
+const Board = ({ board }) => {
+  const [nodes, setNodes] = useState(board.nodes || []);
+  const [edges, setEdges] = useState(board.nodes?.connections || []);
 
   useEffect(() => {
     if (initialBoard?.id !== currentBoardId) {
@@ -138,8 +147,10 @@ const Board = ({ board: initialBoard }) => {
   );
 
   const onConnect = useCallback(
-    (connection) => setEdges((eds) => addEdge(connection, eds)),
-    [setEdges],
+    (connection) => setEdges((eds) => addEdge({
+      ...connection, type: "floating"
+    }, eds)),
+    [setEdges]
   );
 
   const { zoomIn, zoomOut } = useReactFlow();
@@ -246,6 +257,7 @@ const Board = ({ board: initialBoard }) => {
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onNodesDelete={onNodesDelete}
@@ -263,6 +275,7 @@ const Board = ({ board: initialBoard }) => {
         maxZoom={4}
         defaultViewport={{ x: 0, y: 0, zoom: 1 }}
         attributionPosition="bottom-left"
+        connectionMode={ConnectionMode.Loose}
       >
         <Background variant="dots" gap={15} size={1} />
         <MiniMap nodeStrokeWidth={3} zoomable pannable />

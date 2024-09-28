@@ -1,21 +1,51 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
-  Handle, Position, useReactFlow, NodeToolbar, useStore
+  Handle,
+  Position,
+  useReactFlow,
+  NodeToolbar,
+  useStore,
 } from "@xyflow/react";
 import CenteredExpandingTextArea from "./CenteredExpandingTextArea";
 import ResponsiveStar from "./ResponsiveStar";
 import { CircleCheckBig } from "lucide-react";
+import { updateNode } from "@/app/api/node";
 
-const NodeContent = ({ data, isConnectable }) => {
+const NodeContent = ({ id, data, isConnectable }) => {
   const [content, setContent] = useState(data.content || "");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const { getNode, setNodes, setEdges } = useReactFlow();
   const [isHovered, setIsHovered] = useState(false);
   const zoom = useStore((state) => state.transform[2]);
 
-  const handleChange = useCallback((evt) => {
-    setContent(evt.target.value);
-  }, []);
+  useEffect(() => {
+    setContent(data.content || "");
+  }, [data.content]);
+
+  const handleChange = useCallback(
+    (evt) => {
+      const newContent = evt.target.value;
+      setContent(newContent); // Update local state
+
+      setNodes((nds) =>
+        nds.map((node) => {
+          if (node.id === id) {
+            return {
+              ...node,
+              data: { ...node.data, content: newContent },
+            };
+          }
+          return node;
+        }),
+      );
+
+      // Call the updateNode function from your API
+      updateNode(parseInt(id), { content: newContent }).catch((error) => {
+        console.error(`Error updating node ${id} content:`, error);
+      });
+    },
+    [id, setNodes],
+  );
 
   const acceptSuggestion = () => {
     // Logic to handle accepting a suggestion
@@ -37,27 +67,79 @@ const NodeContent = ({ data, isConnectable }) => {
 
     // calls db
     const mockResult = [
-      { id: "a12332", boardId: data.boardId, author: {}, authorId: 1, board: {}, createAt: "", updatedAt: "", title: "Suggestion 1", content: "Suggestion 1 content", xPos: currentNode.position.x + 100, yPos: currentNode.position.y + 10, isSuggestion: true },
-      { id: "a12331", boardId: data.boardId, author: {}, authorId: 1, board: {}, createAt: "", updatedAt: "", title: "Suggestion 2", content: "Suggestion 2 content", xPos: currentNode.position.x - 100, yPos: currentNode.position.y - 20, isSuggestion: true },
-      { id: "a12334", boardId: data.boardId, author: {}, authorId: 1, board: {}, createAt: "", updatedAt: "", title: "Suggestion 3", content: "Suggestion 3 content", xPos: currentNode.position.x - 50, yPos: currentNode.position.y - 30, isSuggestion: true },
-      { id: "q123213", boardId: data.boardId, author: {}, authorId: 1, board: {}, createAt: "", updatedAt: "", title: "Suggestion 2", content: "Suggestion 2 content", xPos: currentNode.position.x + 100, yPos: currentNode.position.y, isSuggestion: false }
-    ]
+      {
+        id: "a12332",
+        boardId: data.boardId,
+        author: {},
+        authorId: 1,
+        board: {},
+        createAt: "",
+        updatedAt: "",
+        title: "Suggestion 1",
+        content: "Suggestion 1 content",
+        xPos: currentNode.position.x + 100,
+        yPos: currentNode.position.y + 10,
+        isSuggestion: true,
+      },
+      {
+        id: "a12331",
+        boardId: data.boardId,
+        author: {},
+        authorId: 1,
+        board: {},
+        createAt: "",
+        updatedAt: "",
+        title: "Suggestion 2",
+        content: "Suggestion 2 content",
+        xPos: currentNode.position.x - 100,
+        yPos: currentNode.position.y - 20,
+        isSuggestion: true,
+      },
+      {
+        id: "a12334",
+        boardId: data.boardId,
+        author: {},
+        authorId: 1,
+        board: {},
+        createAt: "",
+        updatedAt: "",
+        title: "Suggestion 3",
+        content: "Suggestion 3 content",
+        xPos: currentNode.position.x - 50,
+        yPos: currentNode.position.y - 30,
+        isSuggestion: true,
+      },
+      {
+        id: "q123213",
+        boardId: data.boardId,
+        author: {},
+        authorId: 1,
+        board: {},
+        createAt: "",
+        updatedAt: "",
+        title: "Suggestion 2",
+        content: "Suggestion 2 content",
+        xPos: currentNode.position.x + 100,
+        yPos: currentNode.position.y,
+        isSuggestion: false,
+      },
+    ];
 
     const newNodes = mockResult
-      .filter(x => x.isSuggestion === true)
-      .map(n => ({
+      .filter((x) => x.isSuggestion === true)
+      .map((n) => ({
         id: n.id,
         type: "custom",
         data: { content: n.content, id: n.id, isSuggestion: true },
         position: {
           x: n.xPos,
-          y: n.yPos
+          y: n.yPos,
         },
       }));
 
-    console.log(newNodes)
+    console.log(newNodes);
     if (newNodes?.length > 0) {
-      setNodes(prevNodes => [...prevNodes, ...newNodes]);
+      setNodes((prevNodes) => [...prevNodes, ...newNodes]);
     }
 
     // Automatically add an edge between the current node and each new node
@@ -66,7 +148,7 @@ const NodeContent = ({ data, isConnectable }) => {
       source: data.id,
       target: n.id,
       animated: true,
-      type: "floating"
+      type: "floating",
     }));
 
     setEdges((prevEdges) => [...prevEdges, ...newEdges]);
@@ -74,6 +156,11 @@ const NodeContent = ({ data, isConnectable }) => {
 
   const handleNodeMouseEnter = () => {
     setIsHovered(true);
+    // if no suggestions in db
+
+    // call llm
+
+    // add nodes
   };
 
   const handleNodeMouseLeave = (e) => {
@@ -81,9 +168,7 @@ const NodeContent = ({ data, isConnectable }) => {
     if (e === undefined) {
       return;
     }
-    if (
-      !e.relatedTarget
-    ) {
+    if (!e.relatedTarget) {
       setShowSuggestions(false);
     }
   };
@@ -107,9 +192,10 @@ const NodeContent = ({ data, isConnectable }) => {
   return (
     <div
       className={`rounded shadow-md p-4 w-50 h-auto relative transition-colors duration-200
-        ${data.isSuggestion
-          ? "bg-gray-100 dark:bg-gray-500"
-          : "bg-white dark:bg-gray-800"
+        ${
+          data.isSuggestion
+            ? "bg-gray-100 dark:bg-gray-500"
+            : "bg-white dark:bg-gray-800"
         }
         border border-gray-200 dark:border-gray-600
       `}
@@ -169,4 +255,3 @@ const NodeContent = ({ data, isConnectable }) => {
 };
 
 export default NodeContent;
-

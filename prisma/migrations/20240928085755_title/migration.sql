@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Node" ALTER COLUMN "title" DROP NOT NULL;

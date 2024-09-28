@@ -1,3 +1,5 @@
+"use server";
+
 import prisma from "@/lib/prisma";
 import { Node, Prisma } from "@prisma/client";
 

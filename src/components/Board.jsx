@@ -1,12 +1,13 @@
 import React, { useState, useCallback } from "react";
-import ReactFlow, {
+import {
+  ReactFlow,
   addEdge,
   Background,
   applyNodeChanges,
   applyEdgeChanges,
   useReactFlow,
-} from "reactflow";
-import "reactflow/dist/style.css";
+} from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
 import {
   MoreHorizontal,
   MousePointer,
@@ -32,7 +33,7 @@ const Board = ({ board }) => {
 
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges],
+    [setEdges]
   );
 
   const handleAddNode = useCallback(
@@ -47,7 +48,7 @@ const Board = ({ board }) => {
       };
       setNodes((nds) => nds.concat(newNode));
     },
-    [nodes, setNodes],
+    [nodes, setNodes]
   );
 
   const handleSuggestionClick = useCallback(
@@ -57,13 +58,13 @@ const Board = ({ board }) => {
         handleAddNode(
           suggestion,
           parentPosition.x + 200,
-          parentPosition.y + 100,
+          parentPosition.y + 100
         );
       } else {
         handleAddNode(suggestion);
       }
     },
-    [handleAddNode],
+    [handleAddNode]
   );
 
   const onNodesChange = useCallback((changes) => {
@@ -99,13 +100,17 @@ const Board = ({ board }) => {
       </div>
       <div className="z-50 absolute left-4 top-1/2 transform -translate-y-1/2 bg-white dark:bg-black border border-border rounded-lg shadow-lg">
         <button
-          className={`block p-2 hover:bg-accent hover:text-accent-foreground ${tool === "select" ? "bg-accent text-accent-foreground" : ""}`}
+          className={`block p-2 hover:bg-accent hover:text-accent-foreground ${
+            tool === "select" ? "bg-accent text-accent-foreground" : ""
+          }`}
           onClick={() => setTool("select")}
         >
           <MousePointer size={20} />
         </button>
         <button
-          className={`block p-2 hover:bg-accent hover:text-accent-foreground ${tool === "add" ? "bg-accent text-accent-foreground" : ""}`}
+          className={`block p-2 hover:bg-accent hover:text-accent-foreground ${
+            tool === "add" ? "bg-accent text-accent-foreground" : ""
+          }`}
           onClick={() => {
             setTool("add");
             handleAddNode();
@@ -132,7 +137,9 @@ const Board = ({ board }) => {
           <Maximize size={20} />
         </button>
         <button
-          className={`block p-2 hover:bg-accent hover:text-accent-foreground ${isLocked ? "bg-accent text-accent-foreground" : ""}`}
+          className={`block p-2 hover:bg-accent hover:text-accent-foreground ${
+            isLocked ? "bg-accent text-accent-foreground" : ""
+          }`}
           onClick={toggleLock}
         >
           <Lock size={20} />

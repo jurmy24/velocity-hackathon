@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactFlowProvider } from "reactflow";
+import { ReactFlowProvider } from "@xyflow/react";
 import React, { useState, useEffect } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
 import Sidebar from "@/components/LeftSidebar";

@@ -52,7 +52,7 @@ const NodeContent = ({ id, data, isConnectable }) => {
     const updatedNode = { ...data, isSuggestion: false }; // Set isSuggestion to false to mark it as approved
     setNodes((nodes) =>
       nodes.map((node) =>
-        node.id === data.id ? { ...node, data: updatedNode } : node
+        node.id === id ? { ...node, data: updatedNode } : node
       )
     );
     setShowSuggestions(false);

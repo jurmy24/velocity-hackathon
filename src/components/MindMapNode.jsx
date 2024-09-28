@@ -25,7 +25,7 @@ const NodeContent = ({ id, data, isConnectable }) => {
   const handleChange = useCallback(
     (evt) => {
       const newContent = evt.target.value;
-      setContent(newContent); // Update local state
+      setContent(newContent);
 
       setNodes((nds) =>
         nds.map((node) => {
@@ -39,7 +39,6 @@ const NodeContent = ({ id, data, isConnectable }) => {
         }),
       );
 
-      // Call the updateNode function from your API
       updateNode(parseInt(id), { content: newContent }).catch((error) => {
         console.error(`Error updating node ${id} content:`, error);
       });
@@ -48,14 +47,52 @@ const NodeContent = ({ id, data, isConnectable }) => {
   );
 
   const acceptSuggestion = () => {
-    // Logic to handle accepting a suggestion
-    const updatedNode = { ...data, isSuggestion: false }; // Set isSuggestion to false to mark it as approved
+    const updatedNode = { ...data, isSuggestion: false };
     setNodes((nodes) =>
       nodes.map((node) =>
         node.id === id ? { ...node, data: updatedNode } : node,
       ),
     );
     setShowSuggestions(false);
+  };
+
+  const streamContent = (node, fullContent) => {
+    const words = fullContent.split(/\s+/);
+    let currentIndex = 0;
+
+    const streamChunk = () => {
+      if (currentIndex < words.length) {
+        const chunkSize = Math.floor(Math.random() * 3) + 1; // Random chunk size between 1 and 3 words
+        const newChunk = words
+          .slice(currentIndex, currentIndex + chunkSize)
+          .join(" ");
+
+        setNodes((prevNodes) =>
+          prevNodes.map((n) =>
+            n.id === node.id
+              ? {
+                  ...n,
+                  data: {
+                    ...n.data,
+                    content: n.data.content
+                      ? n.data.content + " " + newChunk
+                      : newChunk,
+                  },
+                }
+              : n,
+          ),
+        );
+        currentIndex += chunkSize;
+
+        // Randomize the delay between chunks
+        const delay = Math.random() * (100 - 50) + 100; // Random delay between 100ms and 300ms
+        setTimeout(streamChunk, delay);
+      }
+    };
+
+    // Start the streaming process with an initial delay
+    const initialDelay = Math.random() * (1000 - 500) + 500; // Random delay between 500ms and 1000ms
+    setTimeout(streamChunk, initialDelay);
   };
 
   const handleStarClick = useCallback(() => {
@@ -67,17 +104,24 @@ const NodeContent = ({ id, data, isConnectable }) => {
       return;
     }
 
-    // In a real application, you would call your API or LLM here
-    // For now, we'll use mock data
     const mockSuggestions = [
-      { content: "Suggestion 1 content" },
-      { content: "Suggestion 2 content" },
-      { content: "Suggestion 3 content" },
+      {
+        content:
+          "RAG-powered bot with access to the ArXiv database for real-time scientific research assistance",
+      },
+      {
+        content:
+          "AI-powered virtual research assistant capable of data analysis, literature review, and hypothesis generation",
+      },
+      {
+        content:
+          "Voice-activated research assistant for hands-free project guidance and experimental protocol optimization",
+      },
     ];
 
-    const newNodes = mockSuggestions.map((suggestion, index) => {
-      const angle = (index / mockSuggestions.length) * 2 * Math.PI;
-      const radius = 200; // Distance from the current node
+    const newNodes = Array.from({ length: 3 }, (_, index) => {
+      const angle = (index / 3) * 2 * Math.PI;
+      const radius = 200;
       return {
         id: `suggestion-${id}-${index}`,
         type: "custom",
@@ -86,7 +130,7 @@ const NodeContent = ({ id, data, isConnectable }) => {
           y: currentNode.position.y + Math.sin(angle) * radius,
         },
         data: {
-          content: suggestion.content,
+          content: "",
           isSuggestion: true,
           boardId: data.boardId,
         },
@@ -94,6 +138,12 @@ const NodeContent = ({ id, data, isConnectable }) => {
     });
 
     setNodes((prevNodes) => [...prevNodes, ...newNodes]);
+
+    newNodes.forEach((node) => {
+      const randomSuggestion =
+        mockSuggestions[Math.floor(Math.random() * mockSuggestions.length)];
+      streamContent(node, randomSuggestion.content);
+    });
 
     const newEdges = newNodes.map((node) => ({
       id: `edge-${id}-${node.id}`,
@@ -108,11 +158,6 @@ const NodeContent = ({ id, data, isConnectable }) => {
 
   const handleNodeMouseEnter = () => {
     setIsHovered(true);
-    // if no suggestions in db
-
-    // call llm
-
-    // add nodes
   };
 
   const handleNodeMouseLeave = (e) => {
@@ -124,22 +169,6 @@ const NodeContent = ({ id, data, isConnectable }) => {
       setShowSuggestions(false);
     }
   };
-
-  // const handleSuggestionClick = useCallback(
-  //   (suggestion, parentNode) => {
-  //     if (parentNode && parentNode.position) {
-  //       const parentPosition = parentNode.position;
-  //       handleAddNode(
-  //         suggestion,
-  //         parentPosition.x + 200,
-  //         parentPosition.y + 100,
-  //       );
-  //     } else {
-  //       handleAddNode(suggestion);
-  //     }
-  //   },
-  //   [handleAddNode],
-  // );
 
   return (
     <div
@@ -157,12 +186,6 @@ const NodeContent = ({ id, data, isConnectable }) => {
       <Handle type="source" position={Position.Right} id="b" />
       <Handle type="source" position={Position.Bottom} id="c" />
       <Handle type="source" position={Position.Left} id="d" />
-      {/* <Handle
-        type="target"
-        position={Position.Top}
-        isConnectable={isConnectable}
-        className="w-3 h-3 bg-blue-500 dark:bg-blue-400"
-      /> */}
       <NodeToolbar
         isVisible={isHovered || data.forceToolbarVisible}
         position={{ y: -40 }}
@@ -196,11 +219,6 @@ const NodeContent = ({ id, data, isConnectable }) => {
         readOnly={data.isSuggestion}
         isSuggestion={data.isSuggestion}
       />
-      {/* <Handle
-        type="source"
-        position={Position.Bottom}
-        isConnectable={isConnectable}
-      /> */}
     </div>
   );
 };

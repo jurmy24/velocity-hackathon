@@ -33,6 +33,7 @@ model Node {
   connectedTo   Node[]           @relation("NodeConnections")
   connectedFrom Node[]           @relation("NodeConnections")
   connections   NodeConnection[]
+  isSuggestion    Boolean          @default(false)
 }
 
 model NodeConnection {

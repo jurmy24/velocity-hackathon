@@ -52,7 +52,7 @@ const NodeContent = ({ id, data, isConnectable }) => {
     const updatedNode = { ...data, isSuggestion: false }; // Set isSuggestion to false to mark it as approved
     setNodes((nodes) =>
       nodes.map((node) =>
-        node.id === data.id ? { ...node, data: updatedNode } : node,
+        node.id === id ? { ...node, data: updatedNode } : node,
       ),
     );
     setShowSuggestions(false);
@@ -144,10 +144,9 @@ const NodeContent = ({ id, data, isConnectable }) => {
   return (
     <div
       className={`rounded shadow-md p-4 w-50 h-auto relative transition-colors duration-200
-        ${
-          data.isSuggestion
-            ? "bg-gray-100 dark:bg-gray-500"
-            : "bg-white dark:bg-gray-800"
+        ${data.isSuggestion
+          ? "bg-gray-100 dark:bg-gray-500"
+          : "bg-white dark:bg-gray-800"
         }
         border border-gray-200 dark:border-gray-600
       `}

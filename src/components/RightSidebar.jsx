@@ -2,7 +2,7 @@ import React from "react";
 import { Stars } from "lucide-react";
 import Chat from "./Chat"; // Import the new Chat component
 
-const AISidebar = ({ isOpen, onClose }) => {
+const AISidebar = ({ board, isOpen, onClose }) => {
   return (
     <div
       className={`fixed top-0 right-0 bg-white dark:bg-black h-full w-96 bg-background border-l border-border transform transition-transform duration-300 ease-in-out ${

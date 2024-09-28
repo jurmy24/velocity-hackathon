@@ -77,12 +77,14 @@ export default function RootLayout() {
                 </div>
                 <button
                   onClick={() => setIsAISidebarOpen(!isAISidebarOpen)}
-                  className={`fixed top-1/2 -translate-y-1/2 right-0 p-2 bg-white dark:bg-black border border-border rounded-l-lg shadow-lg text-primary hover:text-primary-foreground transition-all duration-300 ${isAISidebarOpen ? "mr-96" : ""
-                    }`}
+                  className={`fixed top-1/2 -translate-y-1/2 right-0 p-2 bg-white dark:bg-black border border-border rounded-l-lg shadow-lg text-primary hover:text-primary-foreground transition-all duration-300 ${
+                    isAISidebarOpen ? "mr-96" : ""
+                  }`}
                 >
                   <Stars size={20} />
                 </button>
                 <AISidebar
+                  board={selectedBoard}
                   isOpen={isAISidebarOpen}
                   onClose={() => setIsAISidebarOpen(false)}
                 />

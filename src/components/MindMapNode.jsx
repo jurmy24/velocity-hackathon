@@ -146,7 +146,7 @@ const NodeContent = ({ data, isConnectable }) => {
             className="hover:bg-green-100 dark:hover:bg-green-600 rounded p-1 transition-colors duration-200"
             onClick={acceptSuggestion}
           >
-            <CircleCheckBig size={16} className="text-green-500" />
+            <CircleCheckBig size={10} className="text-green-500" />
           </button>
         )}
       </NodeToolbar>

@@ -52,6 +52,8 @@ const Board = ({ board }) => {
         type: "custom",
         position: { x, y },
         data: {
+          isSuggestion: false,
+          id: id,
           content,
         },
       };
@@ -128,6 +130,7 @@ const Board = ({ board }) => {
           data: {
             ...node.data,
             boardId: board.id,
+            nodeId: node.id,
           },
         }))}
         edges={edges}

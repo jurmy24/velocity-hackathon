@@ -34,13 +34,9 @@ const Board = ({ board: initialBoard }) => {
   const [edges, setEdges] = useState([]);
   const [board, setBoard] = useState(initialBoard);
   const [currentBoardId, setCurrentBoardId] = useState(initialBoard?.id);
-const edgeTypes = {
-  floating: SimpleFloatingEdge,
-};
-
-const Board = ({ board }) => {
-  const [nodes, setNodes] = useState(board.nodes || []);
-  const [edges, setEdges] = useState(board.nodes?.connections || []);
+  const edgeTypes = {
+    floating: SimpleFloatingEdge,
+  };
 
   useEffect(() => {
     if (initialBoard?.id !== currentBoardId) {
@@ -113,7 +109,6 @@ const Board = ({ board }) => {
       changes.forEach((change) => {
         const node = newNodes.find((n) => n.id === change.id);
         if (!node) return;
-        console.log("Change: ", change);
 
         if (change.type === "position" && change.dragging === false) {
           // Node dragging has ended, update the position in the database
@@ -123,17 +118,6 @@ const Board = ({ board }) => {
           }).catch((error) => {
             console.error(`Error updating node ${node.id} position:`, error);
           });
-        } else if (change.type === "data") {
-          // Content has changed, update in the database
-          // Assuming the content is stored in data.content
-          if ("content" in change.data) {
-            console.log("Content changed to: ", change.data);
-            updateNode(parseInt(node.id), {
-              content: change.data.content,
-            }).catch((error) => {
-              console.error(`Error updating node ${node.id} content:`, error);
-            });
-          }
         }
       });
 
@@ -147,10 +131,17 @@ const Board = ({ board }) => {
   );
 
   const onConnect = useCallback(
-    (connection) => setEdges((eds) => addEdge({
-      ...connection, type: "floating"
-    }, eds)),
-    [setEdges]
+    (connection) =>
+      setEdges((eds) =>
+        addEdge(
+          {
+            ...connection,
+            type: "floating",
+          },
+          eds,
+        ),
+      ),
+    [setEdges],
   );
 
   const { zoomIn, zoomOut } = useReactFlow();

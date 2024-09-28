@@ -17,7 +17,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     fetchBoards();
-  }, []);
+  });
 
   const fetchBoards = async () => {
     try {

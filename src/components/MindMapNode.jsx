@@ -1,9 +1,11 @@
 import React, { useState, useCallback } from "react";
-import { Handle, Position } from "reactflow";
+import { Handle, Position } from "@xyflow/react";
+import handleAddNode from "@/components/Board"
 
 const NodeContent = ({ data, isConnectable }) => {
   const [content, setContent] = useState(data.content || "");
   const [showSuggestions, setShowSuggestions] = useState(false);
+
 
   const handleChange = useCallback((evt) => {
     setContent(evt.target.value);
@@ -25,22 +27,30 @@ const NodeContent = ({ data, isConnectable }) => {
     }
   };
 
-  const handleSuggestionClick = (suggestion) => {
-    if (
-      data.onSuggestionClick &&
-      typeof data.onSuggestionClick === "function"
-    ) {
-      data.onSuggestionClick(suggestion, data);
-    } else {
-      console.warn("onSuggestionClick is not provided or is not a function");
-    }
-  };
+  const handleSuggestionClick = useCallback(
+    (suggestion, parentNode) => {
+      if (parentNode && parentNode.position) {
+        const parentPosition = parentNode.position;
+        handleAddNode(
+          suggestion,
+          parentPosition.x + 200,
+          parentPosition.y + 100,
+        );
+      } else {
+        handleAddNode(suggestion);
+      }
+    },
+    [handleAddNode],
+  );
 
-  const suggestions = data.suggestions || [
-    "Suggestion 1",
-    "Suggestion 2",
-    "Suggestion 3",
-  ];
+  const createSuggestionsCallback = () => {
+    // calls db
+
+    // if no suggestions in db
+
+    // call llm
+  }
+
 
   return (
     <div
@@ -64,7 +74,7 @@ const NodeContent = ({ data, isConnectable }) => {
         position={Position.Bottom}
         isConnectable={isConnectable}
       />
-      {showSuggestions && (
+      {/* {showSuggestions && (
         <div className="suggestions-container absolute top-full left-0 mt-2 z-10">
           {suggestions.map((suggestion, index) => (
             <div
@@ -76,7 +86,7 @@ const NodeContent = ({ data, isConnectable }) => {
             </div>
           ))}
         </div>
-      )}
+      )} */}
     </div>
   );
 };

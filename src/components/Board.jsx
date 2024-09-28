@@ -1,12 +1,14 @@
 import React, { useState, useCallback } from "react";
-import ReactFlow, {
+import {
+  ReactFlow,
   addEdge,
   Background,
   applyNodeChanges,
   applyEdgeChanges,
   useReactFlow,
-} from "reactflow";
-import "reactflow/dist/style.css";
+  MiniMap,
+} from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
 import {
   MoreHorizontal,
   MousePointer,
@@ -24,16 +26,26 @@ const nodeTypes = {
 
 const Board = ({ board }) => {
   const [nodes, setNodes] = useState(board.nodes || []);
-  const [edges, setEdges] = useState(board.edges || []);
-  const [tool, setTool] = useState("select");
-  const [isLocked, setIsLocked] = useState(false);
+  const [edges, setEdges] = useState(board.nodes?.connections || []);
+
+  const onNodesChange = useCallback(
+    (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
+    [setNodes]
+  );
+
+  const onEdgesChange = useCallback(
+    (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
+    [setEdges]
+  );
+
+  const onConnect = useCallback(
+    (connection) => setEdges((eds) => addEdge(connection, eds)),
+    [setEdges]
+  );
 
   const { zoomIn, zoomOut } = useReactFlow();
 
-  const onConnect = useCallback(
-    (params) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges],
-  );
+  // 
 
   const handleAddNode = useCallback(
     (content = "", x = Math.random() * 500, y = Math.random() * 500) => {
@@ -50,37 +62,14 @@ const Board = ({ board }) => {
     [nodes, setNodes],
   );
 
-  const handleSuggestionClick = useCallback(
-    (suggestion, parentNode) => {
-      if (parentNode && parentNode.position) {
-        const parentPosition = parentNode.position;
-        handleAddNode(
-          suggestion,
-          parentPosition.x + 200,
-          parentPosition.y + 100,
-        );
-      } else {
-        handleAddNode(suggestion);
-      }
-    },
-    [handleAddNode],
-  );
-
-  const onNodesChange = useCallback((changes) => {
-    setNodes((nds) => applyNodeChanges(changes, nds));
-  }, []);
-
-  const onEdgesChange = useCallback((changes) => {
-    setEdges((eds) => applyEdgeChanges(changes, eds));
-  }, []);
 
   const handleFullScreen = useCallback(() => {
     // Implement full screen functionality
   }, []);
 
-  const toggleLock = useCallback(() => {
-    setIsLocked(!isLocked);
-  }, [isLocked]);
+  // const toggleLock = useCallback(() => {
+  //   setIsLocked(!isLocked);
+  // }, [isLocked]);
 
   if (!board) {
     return (
@@ -99,15 +88,13 @@ const Board = ({ board }) => {
       </div>
       <div className="z-50 absolute left-4 top-1/2 transform -translate-y-1/2 bg-white dark:bg-black border border-border rounded-lg shadow-lg">
         <button
-          className={`block p-2 hover:bg-accent hover:text-accent-foreground ${tool === "select" ? "bg-accent text-accent-foreground" : ""}`}
-          onClick={() => setTool("select")}
+          className={`block p-2 hover:bg-accent hover:text-accent-foreground`}
         >
           <MousePointer size={20} />
         </button>
         <button
-          className={`block p-2 hover:bg-accent hover:text-accent-foreground ${tool === "add" ? "bg-accent text-accent-foreground" : ""}`}
+          className={`block p-2 hover:bg-accent hover:text-accent-foreground`}
           onClick={() => {
-            setTool("add");
             handleAddNode();
           }}
         >
@@ -131,19 +118,18 @@ const Board = ({ board }) => {
         >
           <Maximize size={20} />
         </button>
-        <button
+        {/* <button
           className={`block p-2 hover:bg-accent hover:text-accent-foreground ${isLocked ? "bg-accent text-accent-foreground" : ""}`}
           onClick={toggleLock}
         >
           <Lock size={20} />
-        </button>
+        </button> */}
       </div>
       <ReactFlow
         nodes={nodes.map((node) => ({
           ...node,
           data: {
             ...node.data,
-            onSuggestionClick: handleSuggestionClick,
           },
         }))}
         edges={edges}
@@ -152,20 +138,21 @@ const Board = ({ board }) => {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         fitView
-        panOnScroll
+        // panOnScroll
         selectionOnDrag
-        panOnDrag={!isLocked}
-        zoomOnScroll={!isLocked}
-        zoomOnPinch={!isLocked}
-        nodesDraggable={!isLocked}
-        nodesConnectable={!isLocked}
-        elementsSelectable={!isLocked}
+        // panOnDrag={!isLocked}
+        // zoomOnScroll={!isLocked}
+        // zoomOnPinch={!isLocked}
+        // nodesDraggable={!isLocked}
+        // nodesConnectable={!isLocked}
+        // elementsSelectable={!isLocked}
         minZoom={0.2}
         maxZoom={4}
         defaultViewport={{ x: 0, y: 0, zoom: 1 }}
         attributionPosition="bottom-left"
       >
-        <Background />
+        <Background variant="dots" gap={15} size={1} />
+        <MiniMap nodeStrokeWidth={3} zoomable pannable />
       </ReactFlow>
     </div>
   );

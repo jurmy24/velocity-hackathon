@@ -20,7 +20,7 @@ const AISidebar = ({ board, isOpen, onClose }) => {
           <h2 className="text-lg font-semibold">AI Assistant</h2>
         </div>
         <div className="flex-grow overflow-hidden">
-          <Chat />
+          <Chat boardId={board?.id} />
         </div>
       </div>
     </div>

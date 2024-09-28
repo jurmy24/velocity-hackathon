@@ -94,11 +94,11 @@ const Board = ({ board }) => {
         </button>
       </div>
       <div className="z-50 absolute left-4 top-1/2 transform -translate-y-1/2 bg-white dark:bg-black border border-border rounded-lg shadow-lg">
-        <button
+        {/* <button
           className={`block p-2 hover:bg-accent hover:text-accent-foreground`}
         >
           <MousePointer size={20} />
-        </button>
+        </button> */}
         <button
           className={`block p-2 hover:bg-accent hover:text-accent-foreground`}
           onClick={() => {
@@ -119,12 +119,12 @@ const Board = ({ board }) => {
         >
           <ZoomOut size={20} />
         </button>
-        <button
+        {/* <button
           className="block p-2 hover:bg-accent hover:text-accent-foreground"
           onClick={handleFullScreen}
         >
           <Maximize size={20} />
-        </button>
+        </button> */}
         {/* <button
           className={`block p-2 hover:bg-accent hover:text-accent-foreground ${isLocked ? "bg-accent text-accent-foreground" : ""}`}
           onClick={toggleLock}

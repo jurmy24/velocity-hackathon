@@ -4,6 +4,7 @@ import {
 } from "@xyflow/react";
 import CenteredExpandingTextArea from "./CenteredExpandingTextArea";
 import ResponsiveStar from "./ResponsiveStar";
+import { CircleCheckBig } from "lucide-react";
 
 const NodeContent = ({ data, isConnectable }) => {
   const [content, setContent] = useState(data.content || "");
@@ -16,7 +17,21 @@ const NodeContent = ({ data, isConnectable }) => {
     setContent(evt.target.value);
   }, []);
 
+  const acceptSuggestion = () => {
+    // Logic to handle accepting a suggestion
+    const updatedNode = { ...data, isSuggestion: false }; // Set isSuggestion to false to mark it as approved
+    setNodes((nodes) => nodes.map((node) => node.id === data.id ? { ...node, data: updatedNode } : node));
+    setShowSuggestions(false);
+  };
+
   const handleStarClick = () => {
+
+    // if no suggestions in db
+
+    // call llm
+
+    // add nodes
+
     setShowSuggestions(true);
     const currentNode = getNode(data.nodeId);
 
@@ -59,12 +74,6 @@ const NodeContent = ({ data, isConnectable }) => {
 
   const handleNodeMouseEnter = () => {
     setIsHovered(true);
-    // if no suggestions in db
-
-    // call llm
-
-    // add nodes
-
   };
 
   const handleNodeMouseLeave = (e) => {
@@ -118,17 +127,28 @@ const NodeContent = ({ data, isConnectable }) => {
         className="w-3 h-3 bg-blue-500 dark:bg-blue-400"
       /> */}
       <NodeToolbar
-        isVisible={!data.isSuggestion && (isHovered || data.forceToolbarVisible)}
+        isVisible={(isHovered || data.forceToolbarVisible)}
         position={{ y: -40 }}
         className="bg-white dark:bg-gray-700 rounded p-1 flex items-center border border-gray-200 dark:border-gray-600 shadow-lg transition-colors duration-200"
         align="end"
       >
-        <button
-          className="hover:bg-gray-100 dark:hover:bg-gray-600 rounded p-1 transition-colors duration-200"
-          onClick={handleStarClick}
-        >
-          <ResponsiveStar zoom={zoom} />
-        </button>
+        {!data.isSuggestion && (
+          <button
+            className="hover:bg-gray-100 dark:hover:bg-gray-600 rounded p-1 transition-colors duration-200"
+            onClick={handleStarClick}
+          >
+            <ResponsiveStar zoom={zoom} />
+          </button>)
+        }
+
+        {data.isSuggestion && (
+          <button
+            className="hover:bg-green-100 dark:hover:bg-green-600 rounded p-1 transition-colors duration-200"
+            onClick={acceptSuggestion}
+          >
+            <CircleCheckBig size={16} className="text-green-500" />
+          </button>
+        )}
       </NodeToolbar>
       <CenteredExpandingTextArea
         content={content}
@@ -144,7 +164,7 @@ const NodeContent = ({ data, isConnectable }) => {
         position={Position.Bottom}
         isConnectable={isConnectable}
       /> */}
-    </div>
+    </div >
   );
 };
 

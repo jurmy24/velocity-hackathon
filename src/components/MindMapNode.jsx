@@ -1,11 +1,11 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import { Handle, Position } from "@xyflow/react";
-import handleAddNode from "@/components/Board"
 
 const NodeContent = ({ data, isConnectable }) => {
   const [content, setContent] = useState(data.content || "");
   const [showSuggestions, setShowSuggestions] = useState(false);
 
+  const nodeRef = useRef(null);
 
   const handleChange = useCallback((evt) => {
     setContent(evt.target.value);
@@ -13,6 +13,25 @@ const NodeContent = ({ data, isConnectable }) => {
 
   const handleNodeMouseEnter = () => {
     setShowSuggestions(true);
+    // calls db
+    const mockResult = [
+      { id: 10, boardId: 1, author: {}, authorId: 1, board: {}, createAt: "", updatedAt: "", title: "Suggestion 1", content: "Suggestion 1 content", xPos: 100, yPos: 100, isSuggestion: true },
+      { id: 11, boardId: 1, author: {}, authorId: 1, board: {}, createAt: "", updatedAt: "", title: "Suggestion 2", content: "Suggestion 2 content", xPos: 120, yPos: 120, isSuggestion: false }
+    ]
+    if (data.handleAddNode && nodeRef.current) {
+      const rect = nodeRef.current.getBoundingClientRect();
+
+      mockResult.filter((x) => { x.isSuggestion === true }).forEach(
+        (n) => { data.handleAddNode(n.id, n.content, n.xPos, n.yPos) }
+      );
+    }
+
+    // if no suggestions in db
+
+    // call llm
+
+    // add nodes
+
   };
 
   const handleNodeMouseLeave = (e) => {
@@ -20,37 +39,27 @@ const NodeContent = ({ data, isConnectable }) => {
       return;
     }
     if (
-      !e.relatedTarget ||
-      !e.relatedTarget.closest(".suggestions-container")
+      !e.relatedTarget
     ) {
       setShowSuggestions(false);
     }
   };
 
-  const handleSuggestionClick = useCallback(
-    (suggestion, parentNode) => {
-      if (parentNode && parentNode.position) {
-        const parentPosition = parentNode.position;
-        handleAddNode(
-          suggestion,
-          parentPosition.x + 200,
-          parentPosition.y + 100,
-        );
-      } else {
-        handleAddNode(suggestion);
-      }
-    },
-    [handleAddNode],
-  );
-
-  const createSuggestionsCallback = () => {
-    // calls db
-
-    // if no suggestions in db
-
-    // call llm
-  }
-
+  // const handleSuggestionClick = useCallback(
+  //   (suggestion, parentNode) => {
+  //     if (parentNode && parentNode.position) {
+  //       const parentPosition = parentNode.position;
+  //       handleAddNode(
+  //         suggestion,
+  //         parentPosition.x + 200,
+  //         parentPosition.y + 100,
+  //       );
+  //     } else {
+  //       handleAddNode(suggestion);
+  //     }
+  //   },
+  //   [handleAddNode],
+  // );
 
   return (
     <div
@@ -74,19 +83,7 @@ const NodeContent = ({ data, isConnectable }) => {
         position={Position.Bottom}
         isConnectable={isConnectable}
       />
-      {/* {showSuggestions && (
-        <div className="suggestions-container absolute top-full left-0 mt-2 z-10">
-          {suggestions.map((suggestion, index) => (
-            <div
-              key={index}
-              className="bg-gray-200 opacity-70 p-2 rounded mb-2 cursor-pointer hover:bg-gray-300"
-              onClick={() => handleSuggestionClick(suggestion)}
-            >
-              {suggestion}
-            </div>
-          ))}
-        </div>
-      )} */}
+      {showSuggestions}
     </div>
   );
 };

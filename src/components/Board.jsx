@@ -48,9 +48,9 @@ const Board = ({ board }) => {
   // 
 
   const handleAddNode = useCallback(
-    (content = "", x = Math.random() * 500, y = Math.random() * 500) => {
+    (id = (nodes.length + 1).toString(), content = "", x = Math.random() * 500, y = Math.random() * 500) => {
       const newNode = {
-        id: (nodes.length + 1).toString(),
+        id: id,
         type: "custom",
         position: { x, y },
         data: {
@@ -61,7 +61,6 @@ const Board = ({ board }) => {
     },
     [nodes, setNodes],
   );
-
 
   const handleFullScreen = useCallback(() => {
     // Implement full screen functionality
@@ -130,6 +129,7 @@ const Board = ({ board }) => {
           ...node,
           data: {
             ...node.data,
+            handleAddNode,
           },
         }))}
         edges={edges}

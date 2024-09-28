@@ -25,7 +25,7 @@ const NodeContent = ({ id, data, isConnectable }) => {
   const handleChange = useCallback(
     (evt) => {
       const newContent = evt.target.value;
-      setContent(newContent); // Update local state
+      setContent(newContent);
 
       setNodes((nds) =>
         nds.map((node) => {
@@ -39,7 +39,6 @@ const NodeContent = ({ id, data, isConnectable }) => {
         }),
       );
 
-      // Call the updateNode function from your API
       updateNode(parseInt(id), { content: newContent }).catch((error) => {
         console.error(`Error updating node ${id} content:`, error);
       });
@@ -48,14 +47,37 @@ const NodeContent = ({ id, data, isConnectable }) => {
   );
 
   const acceptSuggestion = () => {
-    // Logic to handle accepting a suggestion
-    const updatedNode = { ...data, isSuggestion: false }; // Set isSuggestion to false to mark it as approved
+    const updatedNode = { ...data, isSuggestion: false };
     setNodes((nodes) =>
       nodes.map((node) =>
         node.id === id ? { ...node, data: updatedNode } : node,
       ),
     );
     setShowSuggestions(false);
+  };
+
+  const streamContent = (node, fullContent) => {
+    let index = 0;
+    const interval = setInterval(() => {
+      if (index <= fullContent.length) {
+        setNodes((prevNodes) =>
+          prevNodes.map((n) =>
+            n.id === node.id
+              ? {
+                  ...n,
+                  data: {
+                    ...n.data,
+                    content: fullContent.slice(0, index),
+                  },
+                }
+              : n,
+          ),
+        );
+        index++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 20); // Adjust the interval for faster or slower typing effect
   };
 
   const handleStarClick = useCallback(() => {
@@ -67,8 +89,6 @@ const NodeContent = ({ id, data, isConnectable }) => {
       return;
     }
 
-    // In a real application, you would call your API or LLM here
-    // For now, we'll use mock data
     const mockSuggestions = [
       { content: "RAG-powered bot with access to the ArXiv database" },
       {
@@ -83,7 +103,7 @@ const NodeContent = ({ id, data, isConnectable }) => {
 
     const newNodes = Array.from({ length: 3 }, (_, index) => {
       const angle = (index / 3) * 2 * Math.PI;
-      const radius = 200; // Distance from the current node
+      const radius = 200;
       return {
         id: `suggestion-${id}-${index}`,
         type: "custom",
@@ -99,31 +119,15 @@ const NodeContent = ({ id, data, isConnectable }) => {
       };
     });
 
-    // Add the empty nodes immediately
     setNodes((prevNodes) => [...prevNodes, ...newNodes]);
 
-    // After a 1-second delay, update the nodes with content
     setTimeout(() => {
-      setNodes((prevNodes) =>
-        prevNodes.map((node) => {
-          if (node.data.isSuggestion && node.data.content === "") {
-            const randomSuggestion =
-              mockSuggestions[
-                Math.floor(Math.random() * mockSuggestions.length)
-              ];
-            return {
-              ...node,
-              data: {
-                ...node.data,
-                content: randomSuggestion.content,
-                className: "typewriter", // Add this class for animation
-              },
-            };
-          }
-          return node;
-        }),
-      );
-    }, 1000); // 1000 milliseconds = 1 second
+      newNodes.forEach((node, index) => {
+        const randomSuggestion =
+          mockSuggestions[Math.floor(Math.random() * mockSuggestions.length)];
+        streamContent(node, randomSuggestion.content);
+      });
+    }, 1000);
 
     const newEdges = newNodes.map((node) => ({
       id: `edge-${id}-${node.id}`,
@@ -138,11 +142,6 @@ const NodeContent = ({ id, data, isConnectable }) => {
 
   const handleNodeMouseEnter = () => {
     setIsHovered(true);
-    // if no suggestions in db
-
-    // call llm
-
-    // add nodes
   };
 
   const handleNodeMouseLeave = (e) => {
@@ -154,22 +153,6 @@ const NodeContent = ({ id, data, isConnectable }) => {
       setShowSuggestions(false);
     }
   };
-
-  // const handleSuggestionClick = useCallback(
-  //   (suggestion, parentNode) => {
-  //     if (parentNode && parentNode.position) {
-  //       const parentPosition = parentNode.position;
-  //       handleAddNode(
-  //         suggestion,
-  //         parentPosition.x + 200,
-  //         parentPosition.y + 100,
-  //       );
-  //     } else {
-  //       handleAddNode(suggestion);
-  //     }
-  //   },
-  //   [handleAddNode],
-  // );
 
   return (
     <div
@@ -188,12 +171,6 @@ const NodeContent = ({ id, data, isConnectable }) => {
       <Handle type="source" position={Position.Right} id="b" />
       <Handle type="source" position={Position.Bottom} id="c" />
       <Handle type="source" position={Position.Left} id="d" />
-      {/* <Handle
-        type="target"
-        position={Position.Top}
-        isConnectable={isConnectable}
-        className="w-3 h-3 bg-blue-500 dark:bg-blue-400"
-      /> */}
       <NodeToolbar
         isVisible={isHovered || data.forceToolbarVisible}
         position={{ y: -40 }}
@@ -227,11 +204,6 @@ const NodeContent = ({ id, data, isConnectable }) => {
         readOnly={data.isSuggestion}
         isSuggestion={data.isSuggestion}
       />
-      {/* <Handle
-        type="source"
-        position={Position.Bottom}
-        isConnectable={isConnectable}
-      /> */}
     </div>
   );
 };

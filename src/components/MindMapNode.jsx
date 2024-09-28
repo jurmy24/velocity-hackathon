@@ -36,7 +36,7 @@ const NodeContent = ({ id, data, isConnectable }) => {
             };
           }
           return node;
-        })
+        }),
       );
 
       // Call the updateNode function from your API
@@ -44,7 +44,7 @@ const NodeContent = ({ id, data, isConnectable }) => {
         console.error(`Error updating node ${id} content:`, error);
       });
     },
-    [id, setNodes]
+    [id, setNodes],
   );
 
   const acceptSuggestion = () => {
@@ -52,8 +52,8 @@ const NodeContent = ({ id, data, isConnectable }) => {
     const updatedNode = { ...data, isSuggestion: false }; // Set isSuggestion to false to mark it as approved
     setNodes((nodes) =>
       nodes.map((node) =>
-        node.id === id ? { ...node, data: updatedNode } : node
-      )
+        node.id === id ? { ...node, data: updatedNode } : node,
+      ),
     );
     setShowSuggestions(false);
   };
@@ -81,8 +81,8 @@ const NodeContent = ({ id, data, isConnectable }) => {
       },
     ];
 
-    const newNodes = mockSuggestions.map((suggestion, index) => {
-      const angle = (index / mockSuggestions.length) * 2 * Math.PI;
+    const newNodes = Array.from({ length: 3 }, (_, index) => {
+      const angle = (index / 3) * 2 * Math.PI;
       const radius = 200; // Distance from the current node
       return {
         id: `suggestion-${id}-${index}`,
@@ -91,16 +91,39 @@ const NodeContent = ({ id, data, isConnectable }) => {
           x: currentNode.position.x + Math.cos(angle) * radius,
           y: currentNode.position.y + Math.sin(angle) * radius,
         },
-        animated: true,
         data: {
-          content: suggestion.content,
+          content: "",
           isSuggestion: true,
           boardId: data.boardId,
         },
       };
     });
 
+    // Add the empty nodes immediately
     setNodes((prevNodes) => [...prevNodes, ...newNodes]);
+
+    // After a 1-second delay, update the nodes with content
+    setTimeout(() => {
+      setNodes((prevNodes) =>
+        prevNodes.map((node) => {
+          if (node.data.isSuggestion && node.data.content === "") {
+            const randomSuggestion =
+              mockSuggestions[
+                Math.floor(Math.random() * mockSuggestions.length)
+              ];
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                content: randomSuggestion.content,
+                className: "typewriter", // Add this class for animation
+              },
+            };
+          }
+          return node;
+        }),
+      );
+    }, 1000); // 1000 milliseconds = 1 second
 
     const newEdges = newNodes.map((node) => ({
       id: `edge-${id}-${node.id}`,

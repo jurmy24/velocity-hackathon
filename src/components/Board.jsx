@@ -12,16 +12,16 @@ import {
   ConnectionMode,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import {
-  MoreHorizontal,
-  MousePointer,
-  PlusCircle,
-  ZoomIn,
-  ZoomOut,
-  Maximize,
-} from "lucide-react";
+import { MoreHorizontal, PlusCircle, ZoomIn, ZoomOut } from "lucide-react";
 import NodeContent from "./MindMapNode";
-import { createNode, deleteNode, updateNode } from "@/app/api/node";
+import {
+  createNode,
+  deleteNode,
+  updateNode,
+  getNodeConnectionsByBoardId,
+  createNodeConnection,
+  deleteNodeConnection,
+} from "@/app/api/node";
 import { getBoardWithNodes } from "@/app/api/board";
 import SimpleFloatingEdge from "./SimpleFloatingEdge";
 
@@ -49,6 +49,8 @@ const Board = ({ board: initialBoard }) => {
       if (currentBoardId) {
         try {
           const fetchedBoard = await getBoardWithNodes(currentBoardId);
+          const connections = await getNodeConnectionsByBoardId(currentBoardId);
+
           if (fetchedBoard) {
             setBoard(fetchedBoard);
             const formattedNodes = fetchedBoard.nodes.map((node) => ({
@@ -57,9 +59,15 @@ const Board = ({ board: initialBoard }) => {
               position: { x: parseFloat(node.xPos), y: parseFloat(node.yPos) },
               data: { content: node.content },
             }));
-            console.log("Formatted Nodes: ", formattedNodes);
             setNodes(formattedNodes);
-            setEdges(fetchedBoard.connections || []);
+
+            const formattedEdges = connections.map((connection) => ({
+              id: `e${connection.id}`,
+              source: connection.nodes[0].id.toString(),
+              target: connection.nodes[1].id.toString(),
+              type: "floating",
+            }));
+            setEdges(formattedEdges);
           } else {
             setNodes([]);
             setEdges([]);
@@ -131,16 +139,55 @@ const Board = ({ board: initialBoard }) => {
   );
 
   const onConnect = useCallback(
-    (connection) =>
-      setEdges((eds) =>
-        addEdge(
-          {
-            ...connection,
-            type: "floating",
-          },
-          eds,
-        ),
-      ),
+    async (connection) => {
+      // Generate a temporary ID for the new edge
+      const tempId = `temp-${Date.now()}`;
+
+      // Create and add the new edge immediately
+      const newEdge = {
+        id: tempId,
+        source: connection.source,
+        target: connection.target,
+        type: "floating",
+      };
+      setEdges((eds) => addEdge(newEdge, eds));
+
+      try {
+        // Persist the connection to the database
+        const newConnection = await createNodeConnection(
+          parseInt(connection.source),
+          parseInt(connection.target),
+        );
+
+        // Update the edge with the real ID from the database
+        setEdges((eds) =>
+          eds.map((edge) =>
+            edge.id === tempId ? { ...edge, id: `e${newConnection.id}` } : edge,
+          ),
+        );
+      } catch (error) {
+        console.error("Error creating node connection:", error);
+        // Remove the edge if the database operation failed
+        setEdges((eds) => eds.filter((edge) => edge.id !== tempId));
+      }
+    },
+    [setEdges],
+  );
+
+  const onEdgesDelete = useCallback(
+    async (edgesToDelete) => {
+      for (const edge of edgesToDelete) {
+        const edgeId = edge.id.startsWith("e") ? edge.id.substring(1) : edge.id;
+        try {
+          if (!edge.id.startsWith("temp-")) {
+            await deleteNodeConnection(parseInt(edgeId));
+          }
+          setEdges((eds) => eds.filter((e) => e.id !== edge.id));
+        } catch (error) {
+          console.error(`Error deleting edge ${edge.id}:`, error);
+        }
+      }
+    },
     [setEdges],
   );
 
@@ -250,8 +297,9 @@ const Board = ({ board: initialBoard }) => {
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
         onNodesDelete={onNodesDelete}
+        onEdgesChange={onEdgesChange}
+        onEdgesDelete={onEdgesDelete}
         onConnect={onConnect}
         fitView
         // panOnScroll

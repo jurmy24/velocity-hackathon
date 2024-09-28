@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { Node, Prisma } from "@prisma/client";
+import { Node, Prisma, NodeConnection } from "@prisma/client";
 
 export const createNode = async (
   data: Prisma.NodeCreateInput,
@@ -47,49 +47,58 @@ export const getNodesByAuthorId = async (authorId: number): Promise<Node[]> => {
   });
 };
 
+export const createNodeConnection = async (
+  sourceId: number,
+  targetId: number,
+): Promise<NodeConnection> => {
+  return prisma.nodeConnection.create({
+    data: {
+      nodes: {
+        connect: [{ id: sourceId }, { id: targetId }],
+      },
+    },
+    include: {
+      nodes: true,
+    },
+  });
+};
+
+export const getNodeConnectionsByBoardId = async (
+  boardId: number,
+): Promise<NodeConnection[]> => {
+  return prisma.nodeConnection.findMany({
+    where: {
+      nodes: {
+        some: {
+          boardId: boardId,
+        },
+      },
+    },
+    include: {
+      nodes: true,
+    },
+  });
+};
+
+export const deleteNodeConnection = async (
+  connectionId: number,
+): Promise<NodeConnection> => {
+  return prisma.nodeConnection.delete({
+    where: { id: connectionId },
+  });
+};
+
 export const getNodeWithConnections = async (
   id: number,
 ): Promise<Node | null> => {
   return prisma.node.findUnique({
     where: { id },
     include: {
-      connectedTo: true,
-      connectedFrom: true,
-      connections: true,
-    },
-  });
-};
-
-export const connectNodes = async (
-  nodeId1: number,
-  nodeId2: number,
-): Promise<Node> => {
-  return prisma.node.update({
-    where: { id: nodeId1 },
-    data: {
-      connectedTo: {
-        connect: { id: nodeId2 },
+      connections: {
+        include: {
+          nodes: true,
+        },
       },
-    },
-    include: {
-      connectedTo: true,
-    },
-  });
-};
-
-export const disconnectNodes = async (
-  nodeId1: number,
-  nodeId2: number,
-): Promise<Node> => {
-  return prisma.node.update({
-    where: { id: nodeId1 },
-    data: {
-      connectedTo: {
-        disconnect: { id: nodeId2 },
-      },
-    },
-    include: {
-      connectedTo: true,
     },
   });
 };

@@ -45,8 +45,6 @@ const Board = ({ board }) => {
 
   const { zoomIn, zoomOut } = useReactFlow();
 
-  // 
-
   const handleAddNode = useCallback(
     (id = (nodes.length + 1).toString(), content = "", x = Math.random() * 500, y = Math.random() * 500) => {
       const newNode = {
@@ -129,7 +127,7 @@ const Board = ({ board }) => {
           ...node,
           data: {
             ...node.data,
-            handleAddNode,
+            boardId: board.id,
           },
         }))}
         edges={edges}

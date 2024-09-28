@@ -7,35 +7,34 @@ const NodeContent = ({ data, isConnectable }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const { getNode, setNodes } = useReactFlow();
 
-  const nodeRef = useRef(null);
-
   const handleChange = useCallback((evt) => {
     setContent(evt.target.value);
   }, []);
 
   const handleNodeMouseEnter = () => {
     setShowSuggestions(true);
+
     // calls db
     const mockResult = [
-      { id: 9923, boardId: 1, author: {}, authorId: 1, board: {}, createAt: "", updatedAt: "", title: "Suggestion 1", content: "Suggestion 1 content", xPos: 100, yPos: 100, isSuggestion: true },
-      { id: 890123, boardId: 1, author: {}, authorId: 1, board: {}, createAt: "", updatedAt: "", title: "Suggestion 2", content: "Suggestion 2 content", xPos: 120, yPos: 120, isSuggestion: false }
+      { id: "a12332", boardId: data.boardId, author: {}, authorId: 1, board: {}, createAt: "", updatedAt: "", title: "Suggestion 1", content: "Suggestion 1 content", xPos: node.x + 100, yPos: node.y, isSuggestion: true },
+      { id: "q123213", boardId: data.boardId, author: {}, authorId: 1, board: {}, createAt: "", updatedAt: "", title: "Suggestion 2", content: "Suggestion 2 content", xPos: node.x + 100, yPos: node.y, isSuggestion: false }
     ]
-    if (data.handleAddNode) {
-      const newNodes = mockResult
-        .filter(x => x.isSuggestion === true)
-        .map(n => ({
-          id: n.id,
-          type: "custom",
-          data: { content: n.content }, // Note: content should be in the data object
-          position: {
-            x: n.xPos,
-            y: n.yPos
-          },
-        }));
 
-      if (newNodes?.length > 0) {
-        setNodes(prevNodes => [...prevNodes, ...newNodes]);
-      }
+    const newNodes = mockResult
+      .filter(x => x.isSuggestion === true)
+      .map(n => ({
+        id: n.id,
+        type: "custom",
+        data: { content: n.content },
+        position: {
+          x: n.xPos,
+          y: n.yPos
+        },
+      }));
+
+    console.log(newNodes)
+    if (newNodes?.length > 0) {
+      setNodes(prevNodes => [...prevNodes, ...newNodes]);
     }
 
     // if no suggestions in db
